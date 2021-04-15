@@ -66,7 +66,7 @@
             "settings": {
               "image": "redislabs/redisedge",
               "createOptions": {
-                "Hostname": "redisedge",
+                "Hostname": "$REDIS_HOST_NAME",
                 "HostConfig": {
                   "PortBindings": {
                     "6379/tcp": [
@@ -99,6 +99,11 @@
             "settings": {
               "image": "${MODULES.RedisTimeSeriesEdge.debug}",
               "createOptions": {}
+            },
+            "env": {
+              "REDIS_HOST_NAME": {
+                "value": "$REDIS_HOST_NAME"
+              }
             }
           }
         }

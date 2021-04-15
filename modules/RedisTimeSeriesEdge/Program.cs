@@ -16,6 +16,9 @@ namespace RedisTimeSeriesEdge
 
         static ConnectionMultiplexer _redis;
 
+        static ConnectionMultiplexer Redis => _redis ??= ConnectionMultiplexer.Connect(
+            Environment.GetEnvironmentVariable("REDIS_HOST_NAME"));
+
         const string TimeSeriesName = "SimulatedTemperatureSensor";
 
         static void Main(string[] args)
@@ -37,7 +40,7 @@ namespace RedisTimeSeriesEdge
             var tcs = new TaskCompletionSource<bool>();
             cancellationToken.Register(s => 
             {
-                _redis?.CloseAsync().Wait();
+                Redis.Close();
                 ((TaskCompletionSource<bool>)s).SetResult(true);
             }, tcs);
             return tcs.Task;
@@ -57,12 +60,6 @@ namespace RedisTimeSeriesEdge
             await moduleClient.OpenAsync();
             Console.WriteLine("IoT Hub module client initialized.");
 
-            if (_redis == null)
-            {
-                _redis = ConnectionMultiplexer.Connect("redisedge");
-                Console.WriteLine("Connection to RedisEdge initialized.");
-            }
-
             await CreateTimeSeriesIfNotExistsAsync();
 
             // Register callback to be called when a message is received by the module
@@ -71,7 +68,7 @@ namespace RedisTimeSeriesEdge
 
         static async Task CreateTimeSeriesIfNotExistsAsync()
         {
-            var timeseriesExists = await _redis.GetDatabase().KeyExistsAsync(TimeSeriesName);
+            var timeseriesExists = await Redis.GetDatabase().KeyExistsAsync(TimeSeriesName);
 
             if (timeseriesExists)
             {
@@ -82,7 +79,7 @@ namespace RedisTimeSeriesEdge
                 var iotEdgedeviceId = Environment.GetEnvironmentVariable("IOTEDGE_DEVICEID");
                 var deviceId = !string.IsNullOrWhiteSpace(iotEdgedeviceId) ? iotEdgedeviceId : "unknown";
 
-                var createResult = await _redis.GetDatabase().ExecuteAsync("TS.CREATE", TimeSeriesName, "LABELS", "deviceId", deviceId);
+                var createResult = await Redis.GetDatabase().ExecuteAsync("TS.CREATE", TimeSeriesName, "LABELS", "deviceId", deviceId);
                 Console.WriteLine($"TimeSeries {TimeSeriesName} created: {createResult}");
             }
         }
@@ -126,7 +123,7 @@ namespace RedisTimeSeriesEdge
         {
             var messageBody = JsonConvert.DeserializeObject<MessageBody>(messageString);
 
-            var result = await _redis.GetDatabase().ExecuteAsync("TS.ADD", TimeSeriesName, 
+            var result = await Redis.GetDatabase().ExecuteAsync("TS.ADD", TimeSeriesName, 
                 messageBody.TimeCreated.ToUnixTimeMilliseconds(), messageBody.Machine.Temperature);
             
             Console.WriteLine($"Added message to TimeSeries {TimeSeriesName}, result: {result}");
