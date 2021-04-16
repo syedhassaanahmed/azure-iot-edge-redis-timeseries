@@ -3,6 +3,7 @@ using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.Runtime.Loader;
 using System.Text;
 using System.Threading;
@@ -12,8 +13,6 @@ namespace RedisTimeSeriesEdge
 {
     class Program
     {
-        static int counter;
-
         static ConnectionMultiplexer _redis;
 
         static ConnectionMultiplexer Redis => _redis ??= ConnectionMultiplexer.Connect(
@@ -64,13 +63,15 @@ namespace RedisTimeSeriesEdge
 
             // Register callback to be called when a message is received by the module
             await moduleClient.SetInputMessageHandlerAsync("input1", PipeMessage, moduleClient);
+
+            await moduleClient.SetMethodDefaultHandlerAsync(GetTimeSeriesInfo, moduleClient);
         }
 
         static async Task CreateTimeSeriesIfNotExistsAsync()
         {
-            var timeseriesExists = await Redis.GetDatabase().KeyExistsAsync(TimeSeriesName);
+            var timeSeriesExists = await Redis.GetDatabase().KeyExistsAsync(TimeSeriesName);
 
-            if (timeseriesExists)
+            if (timeSeriesExists)
             {
                 Console.WriteLine($"TimeSeries {TimeSeriesName} already exists.");
             }
@@ -91,8 +92,6 @@ namespace RedisTimeSeriesEdge
         /// </summary>
         static async Task<MessageResponse> PipeMessage(Message message, object userContext)
         {
-            var counterValue = Interlocked.Increment(ref counter);
-
             if (!(userContext is ModuleClient moduleClient))
             {
                 throw new InvalidOperationException("UserContext doesn't contain " + "expected values");
@@ -100,7 +99,6 @@ namespace RedisTimeSeriesEdge
 
             var messageBytes = message.GetBytes();
             var messageString = Encoding.UTF8.GetString(messageBytes);
-            Console.WriteLine($"Received message: {counterValue}, Body: [{messageString}]");
 
             if (!string.IsNullOrEmpty(messageString))
             {
@@ -116,6 +114,7 @@ namespace RedisTimeSeriesEdge
 
                 Console.WriteLine("Received message sent");
             }
+
             return MessageResponse.Completed;
         }
 
@@ -126,7 +125,29 @@ namespace RedisTimeSeriesEdge
             var result = await Redis.GetDatabase().ExecuteAsync("TS.ADD", TimeSeriesName, 
                 messageBody.TimeCreated.ToUnixTimeMilliseconds(), messageBody.Machine.Temperature);
             
-            Console.WriteLine($"Added message to TimeSeries {TimeSeriesName}, result: {result}");
+            Console.WriteLine($"Added message to TimeSeries {TimeSeriesName}, redisResult: {result}");
+        }
+
+        static async Task<MethodResponse> GetTimeSeriesInfo(MethodRequest methodRequest, object userContext)
+        {
+            Console.WriteLine($"Invoking direct method {nameof(GetTimeSeriesInfo)}.");
+            
+            var result = (RedisResult[]) await Redis.GetDatabase().ExecuteAsync("TS.INFO", TimeSeriesName);
+            var serializedResult = JsonConvert.SerializeObject(ToDictionary(result));
+
+            return new MethodResponse(Encoding.UTF8.GetBytes(serializedResult), 200);
+        }
+
+        static Dictionary<string, string> ToDictionary(RedisResult[] redisResult)
+        {
+            var keyValueResult = new Dictionary<string, string>();
+
+            for (int i = 0; i < redisResult.Length; i += 2)
+            {
+                keyValueResult.Add(redisResult[i].ToString(), redisResult[i + 1].ToString());
+            }
+
+            return keyValueResult;
         }
     }
 }
