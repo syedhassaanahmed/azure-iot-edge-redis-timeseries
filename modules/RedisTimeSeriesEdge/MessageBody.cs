@@ -30,7 +30,7 @@ namespace RedisTimeSeriesEdge
         public Ambient Ambient { get; set; }
 
         [JsonProperty(PropertyName = "timeCreated")]
-        public DateTimeOffset TimeCreated { get; set; }
+        public DateTime TimeCreated { get; set; }
     }
 
     class Machine

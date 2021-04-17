@@ -94,7 +94,7 @@
                 "value": "-1"
               },
               "MessageDelay": {
-                "value": 0
+                "value": "00:00:01"
               }
             }
           },

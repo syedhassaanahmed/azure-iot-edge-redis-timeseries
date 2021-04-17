@@ -1,9 +1,13 @@
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 using Newtonsoft.Json;
+using NRedisTimeSeries;
+using NRedisTimeSeries.DataTypes;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Runtime.Loader;
 using System.Text;
 using System.Threading;
@@ -18,7 +22,7 @@ namespace RedisTimeSeriesEdge
         static ConnectionMultiplexer Redis => _redis ??= ConnectionMultiplexer.Connect(
             Environment.GetEnvironmentVariable("REDIS_HOST_NAME"));
 
-        const string TimeSeriesName = "SimulatedTemperatureSensor";
+        static readonly string[] TimeSeriesKeys = { "simulated_temperature", "simulated_pressure", "simulated_humidity" };
 
         static void Main(string[] args)
         {
@@ -39,6 +43,7 @@ namespace RedisTimeSeriesEdge
             var tcs = new TaskCompletionSource<bool>();
             cancellationToken.Register(s => 
             {
+                Redis.Close();
                 ((TaskCompletionSource<bool>)s).SetResult(true);
             }, tcs);
             return tcs.Task;
@@ -68,19 +73,29 @@ namespace RedisTimeSeriesEdge
 
         static async Task CreateTimeSeriesIfNotExistsAsync()
         {
-            var timeSeriesExists = await Redis.GetDatabase().KeyExistsAsync(TimeSeriesName);
+            Console.WriteLine($"Redis Connection Status: {Redis.GetStatus()}");
 
-            if (timeSeriesExists)
+            var deviceId = Environment.GetEnvironmentVariable("IOTEDGE_DEVICEID");
+            var labels = !string.IsNullOrWhiteSpace(deviceId) ? 
+                new List<TimeSeriesLabel> { new TimeSeriesLabel("deviceId", deviceId) } : null;
+
+            var db = Redis.GetDatabase();
+            var tasks = TimeSeriesKeys.Select(x => CreateTimeSeriesIfNotExistsAsync(db, x, labels));
+            await Task.WhenAll(tasks);
+        }
+
+        static async Task CreateTimeSeriesIfNotExistsAsync(IDatabase db, string timeSeriesName, List<TimeSeriesLabel> labels)
+        {            
+            var timeSeriesExists = await db.KeyExistsAsync(timeSeriesName);
+
+            if (!timeSeriesExists)
             {
-                Console.WriteLine($"TimeSeries {TimeSeriesName} already exists.");
+                await db.TimeSeriesCreateAsync(timeSeriesName, labels: labels);
+                Console.WriteLine($"TimeSeries {timeSeriesName} created.");
             }
             else
             {
-                var iotEdgedeviceId = Environment.GetEnvironmentVariable("IOTEDGE_DEVICEID");
-                var deviceId = !string.IsNullOrWhiteSpace(iotEdgedeviceId) ? iotEdgedeviceId : "unknown";
-
-                var createResult = await Redis.GetDatabase().ExecuteAsync("TS.CREATE", TimeSeriesName, "LABELS", "deviceId", deviceId);
-                Console.WriteLine($"TimeSeries {TimeSeriesName} created: {createResult}");
+                Console.WriteLine($"TimeSeries {timeSeriesName} already exists.");
             }
         }
 
@@ -91,6 +106,9 @@ namespace RedisTimeSeriesEdge
         /// </summary>
         static async Task<MessageResponse> PipeMessage(Message message, object userContext)
         {
+            var sw = new Stopwatch();
+            sw.Start();
+
             if (!(userContext is ModuleClient moduleClient))
             {
                 throw new InvalidOperationException($"{nameof(userContext)} doesn't contain expected value.");
@@ -98,7 +116,6 @@ namespace RedisTimeSeriesEdge
 
             var messageBytes = message.GetBytes();
             var messageString = Encoding.UTF8.GetString(messageBytes);
-
             if (!string.IsNullOrEmpty(messageString))
             {
                 await InsertTimeSeriesAsync(messageString);
@@ -106,13 +123,14 @@ namespace RedisTimeSeriesEdge
                 using var pipeMessage = new Message(messageBytes);
                 foreach (var prop in message.Properties)
                 {
-                    pipeMessage.Properties.Add(prop.Key, prop.Value);
-                    pipeMessage.Properties.Add("storedInRedisTimeSeries", "true");
+                    pipeMessage.Properties.Add(prop.Key, prop.Value);                    
                 }
+                pipeMessage.Properties.Add("storedInRedisTimeSeries", "true");
                 await moduleClient.SendEventAsync("output1", pipeMessage);
-
-                Console.WriteLine("Received message sent");
             }
+
+            sw.Stop();
+            Console.WriteLine($"Message processing took {sw.Elapsed.TotalMilliseconds}ms");
 
             return MessageResponse.Completed;
         }
@@ -121,32 +139,28 @@ namespace RedisTimeSeriesEdge
         {
             var messageBody = JsonConvert.DeserializeObject<MessageBody>(messageString);
 
-            var result = await Redis.GetDatabase().ExecuteAsync("TS.ADD", TimeSeriesName, 
-                messageBody.TimeCreated.ToUnixTimeMilliseconds(), messageBody.Machine.Temperature);
-            
-            Console.WriteLine($"Added message to TimeSeries {TimeSeriesName}, redisResult: {result}");
+            var sequence = new List<(string, TimeStamp, double)>(TimeSeriesKeys.Length);
+            sequence.Add((TimeSeriesKeys[0], messageBody.TimeCreated, messageBody.Machine.Temperature));
+            sequence.Add((TimeSeriesKeys[1], messageBody.TimeCreated, messageBody.Machine.Pressure));
+            sequence.Add((TimeSeriesKeys[2], messageBody.TimeCreated, messageBody.Ambient.Humidity));
+
+            await Redis.GetDatabase().TimeSeriesMAddAsync(sequence);
+
+            var webUtcTime = messageBody.TimeCreated.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+            Console.WriteLine($"Message with timestamp {webUtcTime} added to TimeSeries.");
         }
 
         static async Task<MethodResponse> GetTimeSeriesInfo(MethodRequest methodRequest, object userContext)
         {
             Console.WriteLine($"Invoking direct method {nameof(GetTimeSeriesInfo)}.");
-            
-            var result = (RedisResult[]) await Redis.GetDatabase().ExecuteAsync("TS.INFO", TimeSeriesName);
-            var serializedResult = JsonConvert.SerializeObject(ToDictionary(result));
+            try{
+            var db = Redis.GetDatabase();
+            var tasks = TimeSeriesKeys.Select(async x => await db.TimeSeriesInfoAsync(x));
+            var serializedResult = JsonConvert.SerializeObject(await Task.WhenAll(tasks));
 
-            return new MethodResponse(Encoding.UTF8.GetBytes(serializedResult), 200);
-        }
-
-        static Dictionary<string, string> ToDictionary(RedisResult[] redisResult)
-        {
-            var keyValueResult = new Dictionary<string, string>();
-
-            for (int i = 0; i < redisResult.Length; i += 2)
-            {
-                keyValueResult.Add(redisResult[i].ToString(), redisResult[i + 1].ToString());
-            }
-
-            return keyValueResult;
+            Console.WriteLine($"serializedResult: {serializedResult}");
+            } catch (Exception ex) {Console.WriteLine(ex);}
+            return new MethodResponse(Encoding.UTF8.GetBytes("serializedResult"), 200);
         }
     }
 }
