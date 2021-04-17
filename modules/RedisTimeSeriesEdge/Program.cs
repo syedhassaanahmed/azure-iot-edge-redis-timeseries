@@ -138,11 +138,12 @@ namespace RedisTimeSeriesEdge
         static async Task InsertTimeSeriesAsync(string messageString)
         {
             var messageBody = JsonConvert.DeserializeObject<MessageBody>(messageString);
+            var unixTimestamp = messageBody.TimeCreated.ToUnixTimeMilliseconds();
 
             var sequence = new List<(string, TimeStamp, double)>(TimeSeriesKeys.Length);
-            sequence.Add((TimeSeriesKeys[0], messageBody.TimeCreated, messageBody.Machine.Temperature));
-            sequence.Add((TimeSeriesKeys[1], messageBody.TimeCreated, messageBody.Machine.Pressure));
-            sequence.Add((TimeSeriesKeys[2], messageBody.TimeCreated, messageBody.Ambient.Humidity));
+            sequence.Add((TimeSeriesKeys[0], unixTimestamp, messageBody.Machine.Temperature));
+            sequence.Add((TimeSeriesKeys[1], unixTimestamp, messageBody.Machine.Pressure));
+            sequence.Add((TimeSeriesKeys[2], unixTimestamp, messageBody.Ambient.Humidity));
 
             await Redis.GetDatabase().TimeSeriesMAddAsync(sequence);
 
@@ -153,14 +154,25 @@ namespace RedisTimeSeriesEdge
         static async Task<MethodResponse> GetTimeSeriesInfo(MethodRequest methodRequest, object userContext)
         {
             Console.WriteLine($"Invoking direct method {nameof(GetTimeSeriesInfo)}.");
-            try{
+
             var db = Redis.GetDatabase();
-            var tasks = TimeSeriesKeys.Select(async x => await db.TimeSeriesInfoAsync(x));
+            var tasks = TimeSeriesKeys.Select(async x => ToDictionary(x, await db.ExecuteAsync("TS.INFO", x)));
             var serializedResult = JsonConvert.SerializeObject(await Task.WhenAll(tasks));
 
-            Console.WriteLine($"serializedResult: {serializedResult}");
-            } catch (Exception ex) {Console.WriteLine(ex);}
-            return new MethodResponse(Encoding.UTF8.GetBytes("serializedResult"), 200);
+            return new MethodResponse(Encoding.UTF8.GetBytes(serializedResult), 200);
+        }
+
+        static Dictionary<string, string> ToDictionary(string timeSeriesName, RedisResult redisResult)
+        {
+            var redisResults = (RedisResult[])redisResult;
+
+            var keyValueResult = new Dictionary<string, string> { {"timeSeriesName", timeSeriesName} };
+            for (int i = 0; i < redisResults.Length; i += 2)
+            {
+                keyValueResult.Add(redisResults[i].ToString(), redisResults[i + 1].ToString());
+            }
+
+            return keyValueResult;
         }
     }
 }

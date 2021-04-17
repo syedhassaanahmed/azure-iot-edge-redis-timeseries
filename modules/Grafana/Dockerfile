@@ -9,6 +9,7 @@ RUN envsubst < /temp.yml > /datasources.yml
 
 FROM grafana/grafana
 ENV GF_INSTALL_PLUGINS="redis-datasource"
+COPY grafana.ini /etc/grafana/
 COPY --from=substitute /datasources.yml /etc/grafana/provisioning/datasources/
 COPY dashboards.yml /etc/grafana/provisioning/dashboards/
 COPY --chown=grafana:grafana dashboards/ /var/lib/grafana/dashboards/
