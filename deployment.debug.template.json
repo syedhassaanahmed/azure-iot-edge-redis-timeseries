@@ -84,10 +84,18 @@
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
-            "startupOrder": 1,
+            "startupOrder": 0,
             "settings": {
               "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0",
               "createOptions": {}
+            },
+            "env": {
+              "MessageCount": {
+                "value": -1
+              },
+              "MessageDelay": {
+                "value": 0
+              }
             }
           },
           "RedisTimeSeriesEdge": {
@@ -103,6 +111,76 @@
             "env": {
               "REDIS_HOST_NAME": {
                 "value": "$REDIS_HOST_NAME"
+              }
+            }
+          },
+          "RedisExporter": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "startupOrder": 1,
+            "settings": {
+              "image": "oliver006/redis_exporter",
+              "createOptions": {
+                "Hostname": "$REDIS_EXPORTER_HOST_NAME",
+                "HostConfig": {
+                  "PortBindings": {
+                    "9121/tcp": [
+                      {
+                        "HostPort": "9121"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "env": {
+              "REDIS_ADDR": {
+                "value": "redis://$REDIS_HOST_NAME:6379"
+              }
+            }
+          },
+          "Prometheus": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "startupOrder": 2,
+            "settings": {
+              "image": "${MODULES.Prometheus}",
+              "createOptions": {
+                "Hostname": "$PROMETHEUS_HOST_NAME",
+                "HostConfig": {
+                  "PortBindings": {
+                    "9090/tcp": [
+                      {
+                        "HostPort": "9090"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "Grafana": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "startupOrder": 3,
+            "settings": {
+              "image": "${MODULES.Grafana}",
+              "createOptions": {
+                "HostConfig": {
+                  "PortBindings": {
+                    "3000/tcp": [
+                      {
+                        "HostPort": "3000"
+                      }
+                    ]
+                  }
+                }
               }
             }
           }

@@ -39,7 +39,6 @@ namespace RedisTimeSeriesEdge
             var tcs = new TaskCompletionSource<bool>();
             cancellationToken.Register(s => 
             {
-                Redis.Close();
                 ((TaskCompletionSource<bool>)s).SetResult(true);
             }, tcs);
             return tcs.Task;
@@ -94,7 +93,7 @@ namespace RedisTimeSeriesEdge
         {
             if (!(userContext is ModuleClient moduleClient))
             {
-                throw new InvalidOperationException("UserContext doesn't contain " + "expected values");
+                throw new InvalidOperationException($"{nameof(userContext)} doesn't contain expected value.");
             }
 
             var messageBytes = message.GetBytes();
