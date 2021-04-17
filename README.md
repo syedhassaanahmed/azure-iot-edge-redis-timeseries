@@ -3,10 +3,10 @@ This sample Azure IoT Edge solution demonstrates how to store sensor timeseries 
 
 The custom edge module also provides an [Azure IoT Hub Direct Method](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-direct-methods) named `GetTimeSeriesInfo`. This method can be used to retrieve statistics about the stored data in RedisTimeSeries.
 
-<div style=""><img src="images/dataflow.png"/></center></div>
+<div style=""><img src="images/data_flow.png"/></center></div>
 
 ## Grafana Dashboards
-Simulated TimeSeries dashboard was created using the [Redis Data Source for Grafana
+Simulated timeseries dashboard was created using the [Redis Data Source for Grafana
 ](https://github.com/RedisGrafana/grafana-redis-datasource).
 <div style=""><img src="images/timeseries_dashboard.png"/></center></div>
 
