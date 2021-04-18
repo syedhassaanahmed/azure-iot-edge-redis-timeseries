@@ -64,7 +64,7 @@
             "restartPolicy": "always",
             "startupOrder": 0,
             "settings": {
-              "image": "redislabs/redisedge",
+              "image": "${MODULES.RedisEdge}",
               "createOptions": {
                 "Hostname": "$REDIS_HOST_NAME",
                 "HostConfig": {

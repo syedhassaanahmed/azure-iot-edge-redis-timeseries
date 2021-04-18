@@ -167,7 +167,7 @@ namespace RedisTimeSeriesEdge
             var redisResults = (RedisResult[])redisResult;
 
             var keyValueResult = new Dictionary<string, string> { {"timeSeriesName", timeSeriesName} };
-            for (int i = 0; i < redisResults.Length; i += 2)
+            for (var i = 0; i < redisResults.Length; i += 2)
             {
                 keyValueResult.Add(redisResults[i].ToString(), redisResults[i + 1].ToString());
             }

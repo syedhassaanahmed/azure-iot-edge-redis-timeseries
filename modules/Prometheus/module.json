@@ -4,7 +4,7 @@
     "image": {
         "repository": "${CONTAINER_REGISTRY_ADDRESS}/prometheus",
         "tag": {
-            "version": "0.0.1",
+            "version": "${BUILD_VERSION}",
             "platforms": {
                 "amd64": "./Dockerfile"
             }
