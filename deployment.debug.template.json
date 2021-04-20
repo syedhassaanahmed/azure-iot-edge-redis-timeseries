@@ -66,16 +66,7 @@
             "settings": {
               "image": "${MODULES.RedisEdge}",
               "createOptions": {
-                "Hostname": "$REDIS_HOST_NAME",
-                "HostConfig": {
-                  "PortBindings": {
-                    "6379/tcp": [
-                      {
-                        "HostPort": "6379"
-                      }
-                    ]
-                  }
-                }
+                "Hostname": "$REDIS_HOST_NAME"
               }
             }
           },
@@ -123,16 +114,7 @@
             "settings": {
               "image": "oliver006/redis_exporter",
               "createOptions": {
-                "Hostname": "$REDIS_EXPORTER_HOST_NAME",
-                "HostConfig": {
-                  "PortBindings": {
-                    "9121/tcp": [
-                      {
-                        "HostPort": "9121"
-                      }
-                    ]
-                  }
-                }
+                "Hostname": "$REDIS_EXPORTER_HOST_NAME"
               }
             },
             "env": {
@@ -150,16 +132,7 @@
             "settings": {
               "image": "${MODULES.Prometheus}",
               "createOptions": {
-                "Hostname": "$PROMETHEUS_HOST_NAME",
-                "HostConfig": {
-                  "PortBindings": {
-                    "9090/tcp": [
-                      {
-                        "HostPort": "9090"
-                      }
-                    ]
-                  }
-                }
+                "Hostname": "$PROMETHEUS_HOST_NAME"
               }
             }
           },
