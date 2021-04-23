@@ -1,5 +1,6 @@
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NRedisTimeSeries;
 using NRedisTimeSeries.DataTypes;
@@ -17,6 +18,8 @@ namespace RedisTimeSeriesEdge
 {
     class Program
     {
+        static ILogger Log;
+
         static ConnectionMultiplexer _redis;
 
         static ConnectionMultiplexer Redis => _redis ??= ConnectionMultiplexer.Connect(
@@ -26,6 +29,8 @@ namespace RedisTimeSeriesEdge
 
         static void Main(string[] args)
         {
+            Log = Logger.Factory.CreateLogger<string>();
+
             Init().Wait();
 
             // Wait until the app unloads or is cancelled
@@ -61,7 +66,7 @@ namespace RedisTimeSeriesEdge
             // Open a connection to the Edge runtime
             var moduleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
             await moduleClient.OpenAsync();
-            Console.WriteLine("IoT Hub module client initialized.");
+            Log.LogInformation("IoT Hub module client initialized.");
 
             await CreateTimeSeriesIfNotExistsAsync();
 
@@ -73,7 +78,7 @@ namespace RedisTimeSeriesEdge
 
         static async Task CreateTimeSeriesIfNotExistsAsync()
         {
-            Console.WriteLine($"Redis Connection Status: {Redis.GetStatus()}");
+            Log.LogInformation($"Redis Connection Status: {Redis.GetStatus()}");
 
             var deviceId = Environment.GetEnvironmentVariable("IOTEDGE_DEVICEID");
             var labels = !string.IsNullOrWhiteSpace(deviceId) ? 
@@ -91,11 +96,11 @@ namespace RedisTimeSeriesEdge
             if (!timeSeriesExists)
             {
                 await db.TimeSeriesCreateAsync(timeSeriesName, labels: labels);
-                Console.WriteLine($"TimeSeries {timeSeriesName} created.");
+                Log.LogInformation($"TimeSeries {timeSeriesName} created.");
             }
             else
             {
-                Console.WriteLine($"TimeSeries {timeSeriesName} already exists.");
+                Log.LogInformation($"TimeSeries {timeSeriesName} already exists.");
             }
         }
 
@@ -111,7 +116,9 @@ namespace RedisTimeSeriesEdge
 
             if (!(userContext is ModuleClient moduleClient))
             {
-                throw new InvalidOperationException($"{nameof(userContext)} doesn't contain expected value.");
+                var errorMessage = $"{nameof(userContext)} doesn't contain expected value.";
+                Log.LogError(errorMessage);
+                throw new InvalidOperationException(errorMessage);
             }
 
             var messageBytes = message.GetBytes();
@@ -130,7 +137,7 @@ namespace RedisTimeSeriesEdge
             }
 
             sw.Stop();
-            Console.WriteLine($"Message processing took {sw.Elapsed.TotalMilliseconds}ms");
+            Log.LogDebug($"Message processing took {sw.Elapsed.TotalMilliseconds}ms");
 
             return MessageResponse.Completed;
         }
@@ -148,12 +155,12 @@ namespace RedisTimeSeriesEdge
             await Redis.GetDatabase().TimeSeriesMAddAsync(sequence);
 
             var webUtcTime = messageBody.TimeCreated.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
-            Console.WriteLine($"Message with timestamp {webUtcTime} added to TimeSeries.");
+            Log.LogDebug($"Message with timestamp {webUtcTime} added to TimeSeries.");
         }
 
         static async Task<MethodResponse> GetTimeSeriesInfo(MethodRequest methodRequest, object userContext)
         {
-            Console.WriteLine($"Invoking direct method {nameof(GetTimeSeriesInfo)}.");
+            Log.LogInformation($"Invoking direct method {nameof(GetTimeSeriesInfo)}.");
 
             var db = Redis.GetDatabase();
             var tasks = TimeSeriesKeys.Select(async x => ToDictionary(x, await db.ExecuteAsync("TS.INFO", x)));
