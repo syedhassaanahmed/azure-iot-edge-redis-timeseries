@@ -1,3 +1,4 @@
+using IoTEdgeLogger;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 using Microsoft.Extensions.Logging;
@@ -29,6 +30,7 @@ namespace RedisTimeSeriesEdge
 
         static void Main(string[] args)
         {
+            Logger.SetLogLevel("debug");
             Log = Logger.Factory.CreateLogger<string>();
 
             Init().Wait();
