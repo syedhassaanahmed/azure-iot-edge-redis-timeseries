@@ -24,9 +24,6 @@ namespace RedisTimeSeriesEdge
             if (redis == null)
                 throw new ArgumentNullException(nameof(redis));
 
-            if (log == null)
-                throw new ArgumentNullException(nameof(log));
-
             Redis = redis;
             Log = log;
             DeviceId = deviceId;
@@ -49,11 +46,11 @@ namespace RedisTimeSeriesEdge
             if (!timeSeriesExists)
             {
                 await db.TimeSeriesCreateAsync(timeSeriesName, labels: labels);
-                Log.LogInformation($"TimeSeries {timeSeriesName} created.");
+                Log?.LogInformation($"TimeSeries {timeSeriesName} created.");
             }
             else
             {
-                Log.LogInformation($"TimeSeries {timeSeriesName} already exists.");
+                Log?.LogInformation($"TimeSeries {timeSeriesName} already exists.");
             }
         }
 
@@ -69,7 +66,7 @@ namespace RedisTimeSeriesEdge
             await Redis.GetDatabase().TimeSeriesMAddAsync(sequence);
 
             var webUtcTime = timeCreated.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
-            Log.LogDebug($"Message with timestamp {webUtcTime} added to TimeSeries.");
+            Log?.LogDebug($"Message with timestamp {webUtcTime} added to TimeSeries.");
         }
 
         public async Task<IDictionary<string, string>[]> GetTimeSeriesInfoAsync()
@@ -81,7 +78,7 @@ namespace RedisTimeSeriesEdge
 
         IDictionary<string, string> ToDictionary(string timeSeriesName, RedisResult redisResult)
         {
-            Log.LogInformation($"Info obtained for TimeSeries: {timeSeriesName}");
+            Log?.LogInformation($"Info obtained for TimeSeries: {timeSeriesName}");
 
             var redisResults = (RedisResult[])redisResult;
 
