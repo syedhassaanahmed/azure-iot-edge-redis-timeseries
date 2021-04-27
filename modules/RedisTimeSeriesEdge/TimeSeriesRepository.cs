@@ -22,7 +22,9 @@ namespace RedisTimeSeriesEdge
         public TimeSeriesRepository(IConnectionMultiplexer redis, ILogger log, string deviceId)
         {
             if (redis == null)
+            {
                 throw new ArgumentNullException(nameof(redis));
+            }
 
             Redis = redis;
             Log = log;
