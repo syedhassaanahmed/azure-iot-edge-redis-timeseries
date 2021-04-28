@@ -11,12 +11,14 @@ pool:
 
 steps:
 - task: AzureIoTEdge@2
+  displayName: 'Azure IoT Edge - Build module images'
   inputs:
     action: 'Build module images'
     templateFilePath: 'deployment.template.json'
     defaultPlatform: 'amd64'
 
 - task: AzureIoTEdge@2
+  displayName: 'Azure IoT Edge - Push module images'
   inputs:
     action: 'Push module images'
     containerregistrytype: 'Azure Container Registry'
@@ -26,17 +28,17 @@ steps:
     defaultPlatform: 'amd64'
     fillRegistryCredential: 'false'
 
-
-
 - task: CopyFiles@2
+  displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
   inputs:
-    SourceFolder: 'modules\RedisTimeSeriesEdge'
+    SourceFolder: $(Build.SourcesDirectory)'
     Contents: |
       deployment.template.json
       **/module.json
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
