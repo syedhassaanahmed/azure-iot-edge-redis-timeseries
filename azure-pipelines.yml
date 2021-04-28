@@ -29,17 +29,17 @@ steps:
     fillRegistryCredential: 'false'
 
 - task: CopyFiles@2
-  displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+  displayName: 'Copy Files to: $(Build.StagingDirectory)'
   inputs:
-    SourceFolder: $(Build.SourcesDirectory)'
+    SourceFolder:
     Contents: |
       deployment.template.json
       **/module.json
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    TargetFolder: '$(Build.StagingDirectory)'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifacts'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    PathtoPublish: '$(Build.StagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
