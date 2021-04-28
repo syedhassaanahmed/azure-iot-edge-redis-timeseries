@@ -24,7 +24,7 @@ steps:
     azureContainerRegistry: '{"loginServer":"$(azureContainerRegistry)", "id":"/subscriptions/$(azureSubscriptionEndpoint)"}'
     templateFilePath: 'deployment.template.json'
     defaultPlatform: 'amd64'
-    fillRegistryCredential: 'true'
+    fillRegistryCredential: 'false'
 
 - task: CopyFiles@2
   inputs:
