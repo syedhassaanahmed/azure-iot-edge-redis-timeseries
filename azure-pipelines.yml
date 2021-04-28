@@ -21,7 +21,7 @@ steps:
 - task: AzureIoTEdge@2
   inputs:
     action: 'Build module images'
-    templateFilePath: 'azure-iot-edge-redis-timeseries/deployment.template.json'
+    templateFilePath: 'deployment.template.json'
     defaultPlatform: 'amd64'
 
 - task: AzureIoTEdge@2
@@ -30,7 +30,7 @@ steps:
     containerregistrytype: 'Azure Container Registry'
     azureSubscriptionEndpoint: '$(azureSubscription)'
     azureContainerRegistry: '$(azureContainerRegistryLoginServer)'
-    templateFilePath: 'azure-iot-edge-redis-timeseries/deployment.template.json'
+    templateFilePath: 'deployment.template.json'
     defaultPlatform: 'amd64'
     fillRegistryCredential: 'true'
 
