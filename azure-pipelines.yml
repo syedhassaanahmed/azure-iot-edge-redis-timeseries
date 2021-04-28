@@ -28,11 +28,10 @@ steps:
   inputs:
     action: 'Push module images'
     containerregistrytype: 'Azure Container Registry'
-    azureSubscriptionEndpoint: '$(azureSubscription)'
-    azureContainerRegistry: '$(azureContainerRegistryLoginServer)'
+    azureSubscriptionEndpoint: '$(azureSubscriptionEndpoint)'
+    azureContainerRegistry: '{"loginServer":"$(azureContainerRegistry)", "id":"/subscriptions/$(azureSubscriptionEndpoint)"}'
     templateFilePath: 'deployment.template.json'
     defaultPlatform: 'amd64'
-    fillRegistryCredential: 'true'
 
 - task: CopyFiles@2
   inputs:
