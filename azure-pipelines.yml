@@ -17,3 +17,33 @@ steps:
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
   displayName: 'Run a multi-line script'
+
+- task: AzureIoTEdge@2
+  inputs:
+    action: 'Build module images'
+    templateFilePath: 'azure-iot-edge-redis-timeseries/deployment.template.json'
+    defaultPlatform: 'amd64'
+
+- task: AzureIoTEdge@2
+  inputs:
+    action: 'Push module images'
+    containerregistrytype: 'Azure Container Registry'
+    azureSubscriptionEndpoint: '$(azureSubscription)'
+    azureContainerRegistry: '$(azureContainerRegistryLoginServer)'
+    templateFilePath: 'azure-iot-edge-redis-timeseries/deployment.template.json'
+    defaultPlatform: 'amd64'
+    fillRegistryCredential: 'true'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: 'modules\RedisTimeSeriesEdge'
+    Contents: |
+      deployment.template.json
+      **/module.json
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
