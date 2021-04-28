@@ -7,7 +7,7 @@ RUN apk add gettext
 ADD datasources.yml /temp.yml
 RUN envsubst < /temp.yml > /datasources.yml
 
-FROM grafana/grafana
+FROM grafana/grafana:7.5.5-ubuntu
 ENV GF_INSTALL_PLUGINS="redis-datasource"
 COPY grafana.ini /etc/grafana/
 COPY --from=substitute /datasources.yml /etc/grafana/provisioning/datasources/
