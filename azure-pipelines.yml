@@ -9,6 +9,9 @@ trigger:
 pool:
   vmImage: ubuntu-18.04
 
+variables:
+  BUILD_VERSION: '$(Build.BuildId)'
+
 steps:
 - task: AzureIoTEdge@2
   displayName: 'Build module images'
@@ -28,22 +31,6 @@ steps:
     defaultPlatform: 'amd64'
     fillRegistryCredential: 'true'
 
-- task: CopyFiles@2
-  displayName: 'Copy Files to: $(Build.StagingDirectory)'
-  inputs:
-    SourceFolder:
-    Contents: |
-      deployment.template.json
-      **/module.json
-    TargetFolder: '$(Build.StagingDirectory)'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifacts'
-  inputs:
-    PathtoPublish: '$(Build.StagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
-    
 - task: AzureIoTEdge@2
   displayName: 'Generate deployment manifest'
   inputs:
