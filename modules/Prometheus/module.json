@@ -2,7 +2,7 @@
     "$schema-version": "0.0.1",
     "description": "",
     "image": {
-        "repository": "${CONTAINER_REGISTRY_ADDRESS}/prometheus",
+        "repository": "${CONTAINER_REGISTRY_SERVER}/prometheus",
         "tag": {
             "version": "${BUILD_VERSION}",
             "platforms": {
