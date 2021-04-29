@@ -47,5 +47,5 @@ steps:
     iothubname: 'edge-test-hub1'
     deploymentid: '$(System.TeamProject)-devops-deployment'
     priority: '0'
-    deviceOption: 'Multiple Devices'
-    targetcondition: 'tags.level = ''Edge'''
+    deviceOption: 'Single Device'
+    deviceId: 'edge02'
