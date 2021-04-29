@@ -3,6 +3,8 @@ using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Prometheus;
+using Prometheus.DotNetRuntime;
 using StackExchange.Redis;
 using System;
 using System.Diagnostics;
@@ -16,6 +18,7 @@ namespace RedisTimeSeriesEdge
     class Program
     {
         const string RedisHostNameKey = "REDIS_HOST_NAME";
+        const int MetricsPort = 9121;
 
         static ILogger Log;
 
@@ -26,6 +29,10 @@ namespace RedisTimeSeriesEdge
             Logger.SetLogLevel("debug");
             Log = Logger.Factory.CreateLogger<string>();
 
+            IDisposable collector = DotNetRuntimeStatsBuilder.Default().StartCollecting();
+            var server = new MetricServer(port: MetricsPort);
+            server.Start();
+
             Init().Wait();
 
             // Wait until the app unloads or is cancelled
@@ -33,6 +40,8 @@ namespace RedisTimeSeriesEdge
             AssemblyLoadContext.Default.Unloading += (ctx) => cts.Cancel();
             Console.CancelKeyPress += (sender, cpe) => cts.Cancel();
             WhenCancelled(cts.Token).Wait();
+
+            server.Stop();
         }
 
         /// <summary>
