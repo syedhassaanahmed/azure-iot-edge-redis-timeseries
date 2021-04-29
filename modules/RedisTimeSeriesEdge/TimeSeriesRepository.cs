@@ -12,9 +12,7 @@ namespace RedisTimeSeriesEdge
     public class TimeSeriesRepository
     {
         readonly IConnectionMultiplexer Redis;
-
         readonly ILogger Log;
-
         readonly string DeviceId;
 
         static readonly string[] TimeSeriesKeys = { "simulated_temperature", "simulated_pressure", "simulated_humidity" };
@@ -93,9 +91,9 @@ namespace RedisTimeSeriesEdge
             return keyValueResult;
         }
 
-        public void Close()
+        public async Task CloseAsync()
         {
-            Redis.Close();
+            await Redis.CloseAsync();
         }
     }
 }

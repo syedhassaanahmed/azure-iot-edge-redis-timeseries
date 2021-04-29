@@ -15,7 +15,7 @@
                 "windows-amd64": "./Dockerfile.windows-amd64"
             }
         },
-        "buildOptions": [],
+        "buildOptions": ["--build-arg BUILD_VERSION=${BUILD_VERSION}"],
         "contextPath": "./"
     },
     "language": "csharp"

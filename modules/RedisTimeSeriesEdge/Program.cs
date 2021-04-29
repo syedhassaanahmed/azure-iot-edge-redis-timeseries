@@ -1,6 +1,7 @@
 using IoTEdgeLogger;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
+using Microsoft.Azure.Devices.Shared;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Prometheus;
@@ -8,6 +9,7 @@ using Prometheus.DotNetRuntime;
 using StackExchange.Redis;
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.Loader;
 using System.Text;
 using System.Threading;
@@ -17,31 +19,39 @@ namespace RedisTimeSeriesEdge
 {
     class Program
     {
+        const string DefaultLogLevel = "debug";
         const string RedisHostNameKey = "REDIS_HOST_NAME";
         const int MetricsPort = 9121;
 
         static ILogger Log;
-
         static TimeSeriesRepository Repository;
 
-        static void Main(string[] args)
+        static async Task Main()
         {
-            Logger.SetLogLevel("debug");
+            var metricServer = StartPrometheusMetricServer();
+
+            Logger.SetLogLevel(DefaultLogLevel);
             Log = Logger.Factory.CreateLogger<string>();
-
-            IDisposable collector = DotNetRuntimeStatsBuilder.Default().StartCollecting();
-            var server = new MetricServer(port: MetricsPort);
-            server.Start();
-
-            Init().Wait();
+            
+            await InitAsync();
 
             // Wait until the app unloads or is cancelled
             var cts = new CancellationTokenSource();
             AssemblyLoadContext.Default.Unloading += (ctx) => cts.Cancel();
             Console.CancelKeyPress += (sender, cpe) => cts.Cancel();
-            WhenCancelled(cts.Token).Wait();
+            await WhenCancelled(cts.Token);
 
-            server.Stop();
+            await Repository?.CloseAsync();
+            metricServer.Stop();
+        }
+
+        static MetricServer StartPrometheusMetricServer()
+        {
+            DotNetRuntimeStatsBuilder.Default().StartCollecting();
+            var metricServer = new MetricServer(port: MetricsPort);
+            metricServer.Start();
+
+            return metricServer;
         }
 
         /// <summary>
@@ -52,7 +62,6 @@ namespace RedisTimeSeriesEdge
             var tcs = new TaskCompletionSource<bool>();
             cancellationToken.Register(s => 
             {
-                Repository?.Close();
                 ((TaskCompletionSource<bool>)s).SetResult(true);
             }, tcs);
             return tcs.Task;
@@ -62,7 +71,7 @@ namespace RedisTimeSeriesEdge
         /// Initializes the ModuleClient and sets up the callback to receive
         /// messages containing temperature information
         /// </summary>
-        static async Task Init()
+        static async Task InitAsync()
         {
             var mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
             ITransportSettings[] settings = { mqttSetting };
@@ -72,12 +81,27 @@ namespace RedisTimeSeriesEdge
             await moduleClient.OpenAsync();
             Log.LogInformation("IoT Hub module client initialized.");
 
+            await ReportAssemblyVersionAsync(moduleClient);
+
             await InitTimeSeriesRepositoryAsync();
 
             // Register callback to be called when a message is received by the module
             await moduleClient.SetInputMessageHandlerAsync("input1", PipeMessage, moduleClient);
 
             await moduleClient.SetMethodDefaultHandlerAsync(GetTimeSeriesInfo, moduleClient);
+        }
+
+        static async Task ReportAssemblyVersionAsync(ModuleClient moduleClient)
+        {
+            var assemblyVersion = Assembly.GetEntryAssembly().GetName().Version.ToString();            
+            Log.LogInformation($"Assembly Version: {assemblyVersion}");
+
+            var reportedProperties = new TwinCollection
+            {
+                ["AssemblyVersion"] = assemblyVersion
+            };
+
+            await moduleClient.UpdateReportedPropertiesAsync(reportedProperties);
         }
 
         static async Task InitTimeSeriesRepositoryAsync()
