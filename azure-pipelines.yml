@@ -13,6 +13,29 @@ steps:
 - script: pip install -U iotedgedev
   displayName: 'Install IoT Edge Dev Tool'
 
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+
+- task: UseDotNet@2
+  displayName: 'Install .NET Core SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '3.1.x'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build projects'
+  inputs:
+    command: 'build' 
+    projects: '**/*.csproj'
+  
+- task: DotNetCoreCLI@2
+  displayName: 'Run tests for Redis'
+  inputs:
+    command: 'test' 
+    projects: '**/*.csproj'
+
 - task: AzureIoTEdge@2
   displayName: 'Build module images'
   inputs:
