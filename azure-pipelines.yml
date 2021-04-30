@@ -40,7 +40,7 @@ steps:
   displayName: 'Publish code coverage report'
   inputs:
     codeCoverageTool: 'Cobertura'
-    summaryFileLocation: '$(Build.SourcesDirectory)/coverlet/reports/coverage.cobertura.xml'
+    summaryFileLocation: '$(Build.SourcesDirectory)/coverlet/reports/Cobertura.xml'
 
 - task: AzureIoTEdge@2
   displayName: 'Build module images'
