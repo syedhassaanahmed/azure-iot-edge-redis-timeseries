@@ -1,18 +1,18 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
 
 pool:
-  vmImage: ubuntu-18.04
+  vmImage: ubuntu-latest
 
 variables:
   BUILD_VERSION: '$(Build.BuildId)'
+  iothubname: 'edge-test-hub1'
+  edgeDeviceId: 'edge02'
 
 steps:
+- script: pip install -U iotedgedev
+  displayName: 'Install IoT Edge Dev Tool'
+
 - task: AzureIoTEdge@2
   displayName: 'Build module images'
   inputs:
@@ -47,8 +47,8 @@ steps:
     action: 'Deploy to IoT Edge devices'
     deploymentFilePath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
     azureSubscription: '$(azureSubscriptionEndpoint)'
-    iothubname: 'edge-test-hub1'
+    iothubname: '$(iothubname)'
     deploymentid: '$(System.TeamProject)-devops-deployment'
     priority: '0'
     deviceOption: 'Single Device'
-    deviceId: 'edge02'
+    deviceId: '$(edgeDeviceId)'

@@ -21,10 +21,14 @@ The `.env` file can be modified for container version, container host names and 
 <div style=""><img src="images/data_flow.png"/></center></div>
 
 ## Grafana Dashboards
-Simulated timeseries dashboard was created using the [Redis Data Source for Grafana
-](https://github.com/RedisGrafana/grafana-redis-datasource).
+Simulated timeseries dashboard was created using the [Redis Data Source for Grafana](https://github.com/RedisGrafana/grafana-redis-datasource).
+
 <div style=""><img src="images/timeseries_dashboard.png"/></center></div>
 
-Redis usage dashboard was created using the [Prometheus Redis Metrics Exporter.
-](https://github.com/oliver006/redis_exporter)
+Redis usage dashboard was created using the [Prometheus Redis Metrics Exporter](https://github.com/oliver006/redis_exporter).
+
 <div style=""><img src="images/redis_dashboard.png"/></center></div>
+
+.NET runtime metrics dashboard was created using [prometheus-net.DotNetMetrics](https://github.com/djluck/prometheus-net.DotNetRuntime).
+
+<div style=""><img src="images/dotnet_dashboard.png"/></center></div>
