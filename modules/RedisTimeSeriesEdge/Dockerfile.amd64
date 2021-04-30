@@ -8,7 +8,7 @@ COPY *.csproj ./
 RUN dotnet restore
 
 COPY . ./
-RUN dotnet publish -c Release -o out /p:AssemblyVersion=$BUILD_VERSION /p:FileVersion=$BUILD_VERSION /p:Version=$BUILD_VERSION
+RUN dotnet publish -c Release -o out /p:Version=$BUILD_VERSION
 
 FROM mcr.microsoft.com/dotnet/core/runtime:3.1-buster-slim
 WORKDIR /app
