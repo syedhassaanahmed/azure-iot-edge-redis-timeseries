@@ -1,7 +1,16 @@
 # azure-iot-edge-redis-timeseries
 This sample [Azure IoT Edge](https://docs.microsoft.com/en-us/azure/iot-edge/?view=iotedge-2020-11) solution demonstrates how to store timeseries data from IoT sensors in [RedisTimeSeries](https://oss.redislabs.com/redistimeseries/). The [Simulated Temperature Sensor](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/azure-iot.simulated-temperature-sensor?tab=overview) edge module is used to generate temperature, pressure and humidity readings. These readings are then routed to our custom C# edge module which stores them in RedisTimeSeries.
 
-The custom edge module also provides an [Azure IoT Hub Direct Method](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-direct-methods) named `GetTimeSeriesInfo`. This method can be used to retrieve statistics about the stored data in RedisTimeSeries.
+## Features
+- Connects to Redis with [Unix Sockets](https://redis.io/topics/clients) instead of the TCP port.
+- Sends its .NET Assembly version as an [Azure IoT Hub Module Twin](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-module-twins) Reported Property.
+- Makes .NET runtime metrics available in Prometheus format.
+- Scrapes Redis usage metrics in Prometheus format.
+- Exposes an [Azure IoT Hub Direct Method](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-direct-methods) named `GetTimeSeriesInfo`. This method can be used to retrieve statistics about the stored data in RedisTimeSeries.
+- Provides Grafana dashboards for visualizing timeseries and above Prometheus data sources, [see below](#grafana-dashboards).
+
+## Architecture
+<div style=""><img src="images/data_flow.png"/></center></div>
 
 ## Prerequisites
 - Azure IoT Hub with an edge device provisioned
@@ -16,9 +25,6 @@ The custom edge module also provides an [Azure IoT Hub Direct Method](https://do
 
 ## Configuration
 The `.env` file can be modified for container version, container host names and to use an [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/) instead of a local docker registry.
-
-## Architecture
-<div style=""><img src="images/data_flow.png"/></center></div>
 
 ## Grafana Dashboards
 Simulated timeseries dashboard was created using the [Redis Data Source for Grafana](https://github.com/RedisGrafana/grafana-redis-datasource).
