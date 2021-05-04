@@ -18,7 +18,8 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: 'Restore packages'
   inputs:
-    command: 'restore'   
+    command: 'restore'
+    arguments: 'tests/TimeSeriesRepository.Test/'
 
 - task: DotNetCoreCLI@2
   displayName: "Install dotnet format"
