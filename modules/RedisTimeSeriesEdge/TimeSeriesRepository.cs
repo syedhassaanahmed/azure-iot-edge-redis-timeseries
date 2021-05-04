@@ -31,7 +31,7 @@ namespace RedisTimeSeriesEdge
 
         public async Task CreateTimeSeriesIfNotExistsAsync()
         {
-            var labels = !string.IsNullOrWhiteSpace(DeviceId) ? 
+            var labels = !string.IsNullOrWhiteSpace(DeviceId) ?
                 new List<TimeSeriesLabel> { new TimeSeriesLabel("deviceId", DeviceId) } : null;
 
             var db = Redis.GetDatabase();
@@ -40,7 +40,7 @@ namespace RedisTimeSeriesEdge
         }
 
         async Task CreateTimeSeriesIfNotExistsAsync(IDatabase db, string timeSeriesName, List<TimeSeriesLabel> labels)
-        {            
+        {
             var timeSeriesExists = await db.KeyExistsAsync(timeSeriesName);
 
             if (!timeSeriesExists)
@@ -82,7 +82,7 @@ namespace RedisTimeSeriesEdge
 
             var redisResults = (RedisResult[])redisResult;
 
-            var keyValueResult = new Dictionary<string, string> { {"timeSeriesName", timeSeriesName} };
+            var keyValueResult = new Dictionary<string, string> { { "timeSeriesName", timeSeriesName } };
             for (var i = 0; i < redisResults.Length; i += 2)
             {
                 keyValueResult.Add(redisResults[i].ToString(), redisResults[i + 1].ToString());
