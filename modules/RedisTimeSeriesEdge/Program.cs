@@ -34,7 +34,7 @@ namespace RedisTimeSeriesEdge
 
             Logger.SetLogLevel(DefaultLogLevel);
             Log = Logger.Factory.CreateLogger<string>();
-            
+
             await InitAsync();
 
             // Wait until the app unloads or is cancelled
@@ -62,7 +62,7 @@ namespace RedisTimeSeriesEdge
         public static Task WhenCancelled(CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<bool>();
-            cancellationToken.Register(s => 
+            cancellationToken.Register(s =>
             {
                 ((TaskCompletionSource<bool>)s).SetResult(true);
             }, tcs);
@@ -95,7 +95,7 @@ namespace RedisTimeSeriesEdge
 
         static async Task ReportAssemblyVersionAsync(ModuleClient moduleClient)
         {
-            var assemblyVersion = Assembly.GetEntryAssembly().GetName().Version.ToString();            
+            var assemblyVersion = Assembly.GetEntryAssembly().GetName().Version.ToString();
             Log.LogInformation($"Assembly Version: {assemblyVersion}");
 
             var reportedProperties = new TwinCollection
@@ -119,7 +119,7 @@ namespace RedisTimeSeriesEdge
                 throw new ArgumentException($"File {redisUnixSocketFile} not found.");
             }
 
-            var redisConfig = new ConfigurationOptions { EndPoints = { new UnixDomainSocketEndPoint(redisUnixSocketFile) }};
+            var redisConfig = new ConfigurationOptions { EndPoints = { new UnixDomainSocketEndPoint(redisUnixSocketFile) } };
             var redis = ConnectionMultiplexer.Connect(redisConfig);
             Log.LogInformation($"Redis Connection Status: {redis.GetStatus()}");
 
@@ -148,7 +148,7 @@ namespace RedisTimeSeriesEdge
             if (!string.IsNullOrEmpty(messageString))
             {
                 var messageBody = JsonConvert.DeserializeObject<MessageBody>(messageString);
-                await Repository.InsertTimeSeriesAsync(messageBody.TimeCreated, 
+                await Repository.InsertTimeSeriesAsync(messageBody.TimeCreated,
                     messageBody.Machine.Temperature,
                     messageBody.Machine.Pressure,
                     messageBody.Ambient.Humidity);
@@ -156,7 +156,7 @@ namespace RedisTimeSeriesEdge
                 using var pipeMessage = new Message(messageBytes);
                 foreach (var prop in message.Properties)
                 {
-                    pipeMessage.Properties.Add(prop.Key, prop.Value);                    
+                    pipeMessage.Properties.Add(prop.Key, prop.Value);
                 }
                 pipeMessage.Properties.Add("storedInRedisTimeSeries", "true");
                 await moduleClient.SendEventAsync("output1", pipeMessage);

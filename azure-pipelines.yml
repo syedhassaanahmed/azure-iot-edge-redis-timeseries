@@ -1,3 +1,5 @@
+name: Check PR
+
 trigger:
 - main
 
@@ -12,6 +14,41 @@ variables:
 steps:
 - script: pip install -U iotedgedev
   displayName: 'Install IoT Edge Dev Tool'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build C# projects and run unit tests'
+  inputs:
+    command: 'test' 
+    projects: '**/*.csproj'
+    arguments: '--collect:"XPlat Code Coverage" -- RunConfiguration.DisableAppDomain=true'
+
+- task: DotNetCoreCLI@2
+  displayName: "Install dotnet format"
+  inputs:
+    command: 'custom'
+    custom: 'tool'
+    arguments: 'install -g dotnet-format'
+
+- script: |
+   dotnet format tests/TimeSeriesRepository.Test/ --check --fix-style warn --fix-whitespace 
+   dotnet format modules/RedisTimeSeriesEdge --check --fix-style warn --fix-whitespace  
+  displayName: 'Lint dotnet code'
+  
+- task: DotNetCoreCLI@2
+  displayName: Install ReportGenerator tool
+  inputs:
+    command: custom
+    custom: tool
+    arguments: install --tool-path . dotnet-reportgenerator-globaltool
+
+- script: ./reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/coverlet/reports -reporttypes:"Cobertura"
+  displayName: Create reports
+
+- task: PublishCodeCoverageResults@1
+  displayName: 'Publish code coverage report'
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(Build.SourcesDirectory)/coverlet/reports/Cobertura.xml'
 
 - task: AzureIoTEdge@2
   displayName: 'Build module images'
