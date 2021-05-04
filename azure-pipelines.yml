@@ -12,15 +12,9 @@ variables:
 steps:
 - script: pip install -U iotedgedev
   displayName: 'Install IoT Edge Dev Tool'
-
-- task: DotNetCoreCLI@2
-  displayName: 'Build C# projects'
-  inputs:
-    command: 'build' 
-    projects: '**/*.csproj'
   
 - task: DotNetCoreCLI@2
-  displayName: 'Run tests for RedisTimeSeries'
+  displayName: 'Build C# projects and run unit tests'
   inputs:
     command: 'test' 
     projects: '**/*.csproj'
