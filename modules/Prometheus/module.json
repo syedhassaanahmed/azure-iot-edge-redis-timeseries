@@ -9,7 +9,7 @@
                 "amd64": "./Dockerfile"
             }
         },
-        "buildOptions": ["--build-arg REDIS_EXPORTER_HOST_NAME=${REDIS_EXPORTER_HOST_NAME} --build-arg REDIS_TIME_SERIES_EDGE_HOST_NAME=${REDIS_TIME_SERIES_EDGE_HOST_NAME}"],
+        "buildOptions": ["--build-arg REDIS_EXPORTER_HOST=${REDIS_EXPORTER_HOST} --build-arg REDIS_TIMESERIES_EDGE_HOST=${REDIS_TIMESERIES_EDGE_HOST}"],
         "contextPath": "./"
     },
     "language": "other"
