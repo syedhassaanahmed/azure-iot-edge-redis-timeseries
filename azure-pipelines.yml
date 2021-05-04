@@ -27,7 +27,7 @@ steps:
   inputs:
     command: 'custom'
     custom: 'format'
-    arguments: '--check --fix-style warn --fix-whitespace'
+    arguments: 'tests/TimeSeriesRepository.Test/ --check --fix-style warn --fix-whitespace'
 
 - task: DotNetCoreCLI@2
   displayName: 'Build C# projects and run unit tests'
