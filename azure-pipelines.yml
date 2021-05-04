@@ -14,7 +14,12 @@ variables:
 steps:
 - script: pip install -U iotedgedev
   displayName: 'Install IoT Edge Dev Tool'
-  
+
+- task: DotNetCoreCLI@2
+  displayName: 'Restore packages'
+  inputs:
+    command: 'restore'   
+
 - task: DotNetCoreCLI@2
   displayName: "Install dotnet format"
   inputs:
