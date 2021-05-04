@@ -16,10 +16,11 @@ steps:
   displayName: 'Install IoT Edge Dev Tool'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Restore packages'
+  displayName: 'Build C# projects and run unit tests'
   inputs:
-    command: 'restore'
-    arguments: 'tests/TimeSeriesRepository.Test/'
+    command: 'test' 
+    projects: '**/*.csproj'
+    arguments: '--collect:"XPlat Code Coverage" -- RunConfiguration.DisableAppDomain=true'
 
 - task: DotNetCoreCLI@2
   displayName: "Install dotnet format"
@@ -34,14 +35,7 @@ steps:
     command: 'custom'
     custom: 'format'
     arguments: 'tests/TimeSeriesRepository.Test/ --check --fix-style warn --fix-whitespace'
-
-- task: DotNetCoreCLI@2
-  displayName: 'Build C# projects and run unit tests'
-  inputs:
-    command: 'test' 
-    projects: '**/*.csproj'
-    arguments: '--collect:"XPlat Code Coverage" -- RunConfiguration.DisableAppDomain=true'
-
+    
 - task: DotNetCoreCLI@2
   displayName: Install ReportGenerator tool
   inputs:
