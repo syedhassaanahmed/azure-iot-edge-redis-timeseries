@@ -18,16 +18,16 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: "Install dotnet format"
   inputs:
-    command: custom
-    custom: tool
-    arguments: dotnet tool install -g dotnet-format --version 5.1.* --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
+    command: 'custom'
+    custom: 'tool'
+    arguments: 'dotnet tool install -g dotnet-format --version 5.0.211103 --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json'
 
 - task: DotNetCoreCLI@2
   displayName: 'Lint dotnet code'
   inputs:
     command: 'custom'
     custom: 'format'
-    arguments: '--check --verbosity diagnostic'
+    arguments: '--check --fix-style warn --fix-whitespace'
 
 - task: DotNetCoreCLI@2
   displayName: 'Build C# projects and run unit tests'
