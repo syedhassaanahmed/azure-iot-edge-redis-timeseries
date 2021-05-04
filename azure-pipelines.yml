@@ -31,9 +31,6 @@ steps:
 
 - script: |
    dotnet format tests/TimeSeriesRepository.Test/ --check --fix-style warn --fix-whitespace 
-   dotnet format modules/Grafana --check --fix-style warn --fix-whitespace  
-   dotnet format modules/Prometheus --check --fix-style warn --fix-whitespace  
-   dotnet format modules/RedisTimeSeries --check --fix-style warn --fix-whitespace  
    dotnet format modules/RedisTimeSeriesEdge --check --fix-style warn --fix-whitespace  
   displayName: 'Lint dotnet code'
   
