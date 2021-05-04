@@ -57,16 +57,20 @@
           }
         },
         "modules": {
-          "RedisEdge": {
+          "RedisTimeSeries": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "startupOrder": 0,
             "settings": {
-              "image": "${MODULES.RedisEdge}",
+              "image": "${MODULES.RedisTimeSeries}",
               "createOptions": {
-                "Hostname": "$REDIS_HOST_NAME"
+                "HostConfig": {
+                  "Binds": [
+                    "$REDIS_UNIX_SOCKET_VOL:$REDIS_UNIX_SOCKET_DIR"
+                  ]
+                }
               }
             }
           },
@@ -98,12 +102,17 @@
             "settings": {
               "image": "${MODULES.RedisTimeSeriesEdge.debug}",
               "createOptions": {
-                "Hostname": "$REDIS_TIME_SERIES_EDGE_HOST_NAME"
+                "Hostname": "$REDIS_TIMESERIES_EDGE_HOST",
+                "HostConfig": {
+                  "Binds": [
+                    "$REDIS_UNIX_SOCKET_VOL:$REDIS_UNIX_SOCKET_DIR"
+                  ]
+                }
               }
             },
             "env": {
-              "REDIS_HOST_NAME": {
-                "value": "$REDIS_HOST_NAME"
+              "REDIS_UNIX_SOCKET_FILE": {
+                "value": "$REDIS_UNIX_SOCKET_DIR/redis.sock"
               }
             }
           },
@@ -116,12 +125,17 @@
             "settings": {
               "image": "oliver006/redis_exporter",
               "createOptions": {
-                "Hostname": "$REDIS_EXPORTER_HOST_NAME"
+                "Hostname": "$REDIS_EXPORTER_HOST",
+                "HostConfig": {
+                  "Binds": [
+                    "$REDIS_UNIX_SOCKET_VOL:$REDIS_UNIX_SOCKET_DIR"
+                  ]
+                }
               }
             },
             "env": {
               "REDIS_ADDR": {
-                "value": "redis://$REDIS_HOST_NAME:6379"
+                "value": "unix://$REDIS_UNIX_SOCKET_DIR/redis.sock"
               }
             }
           },
@@ -134,7 +148,7 @@
             "settings": {
               "image": "${MODULES.Prometheus}",
               "createOptions": {
-                "Hostname": "$PROMETHEUS_HOST_NAME"
+                "Hostname": "$PROMETHEUS_HOST"
               }
             }
           },
@@ -148,6 +162,9 @@
               "image": "${MODULES.Grafana}",
               "createOptions": {
                 "HostConfig": {
+                  "Binds": [
+                    "$REDIS_UNIX_SOCKET_VOL:$REDIS_UNIX_SOCKET_DIR"
+                  ],
                   "PortBindings": {
                     "3000/tcp": [
                       {

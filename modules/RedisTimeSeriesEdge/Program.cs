@@ -9,6 +9,8 @@ using Prometheus.DotNetRuntime;
 using StackExchange.Redis;
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Text;
@@ -20,7 +22,7 @@ namespace RedisTimeSeriesEdge
     class Program
     {
         const string DefaultLogLevel = "debug";
-        const string RedisHostNameKey = "REDIS_HOST_NAME";
+        const string RedisUnixSocketFileKey = "REDIS_UNIX_SOCKET_FILE";
         const int MetricsPort = 9121;
 
         static ILogger Log;
@@ -106,13 +108,19 @@ namespace RedisTimeSeriesEdge
 
         static async Task InitTimeSeriesRepositoryAsync()
         {
-            var redisHostName = Environment.GetEnvironmentVariable(RedisHostNameKey);
-            if (string.IsNullOrWhiteSpace(redisHostName))
+            var redisUnixSocketFile = Environment.GetEnvironmentVariable(RedisUnixSocketFileKey);
+            if (string.IsNullOrWhiteSpace(redisUnixSocketFile))
             {
-                throw new ArgumentException($"{RedisHostNameKey} not configured.");
+                throw new ArgumentNullException(RedisUnixSocketFileKey);
             }
 
-            var redis = ConnectionMultiplexer.Connect(redisHostName);
+            if (!File.Exists(redisUnixSocketFile))
+            {
+                throw new ArgumentException($"File {redisUnixSocketFile} not found.");
+            }
+
+            var redisConfig = new ConfigurationOptions { EndPoints = { new UnixDomainSocketEndPoint(redisUnixSocketFile) }};
+            var redis = ConnectionMultiplexer.Connect(redisConfig);
             Log.LogInformation($"Redis Connection Status: {redis.GetStatus()}");
 
             var iotEdgeDeviceId = Environment.GetEnvironmentVariable("IOTEDGE_DEVICEID");
@@ -132,9 +140,7 @@ namespace RedisTimeSeriesEdge
 
             if (!(userContext is ModuleClient moduleClient))
             {
-                var errorMessage = $"{nameof(userContext)} doesn't contain expected value.";
-                Log.LogError(errorMessage);
-                throw new InvalidOperationException(errorMessage);
+                throw new InvalidOperationException($"{nameof(userContext)} doesn't contain expected value.");
             }
 
             var messageBytes = message.GetBytes();
