@@ -29,7 +29,10 @@ steps:
     custom: 'tool'
     arguments: 'install -g dotnet-format'
 
-- script: dotnet format tests/TimeSeriesRepository.Test/ --check --fix-style warn --fix-whitespace dotnet format modules --check --fix-style warn --fix-whitespace  dotnet format tests/TimeSeriesRepository.Test/ --check --fix-style warn --fix-whitespace  
+- script: |
+   dotnet format tests/TimeSeriesRepository.Test/ --check --fix-style warn --fix-whitespace 
+   dotnet format modules/Garafana --check --fix-style warn --fix-whitespace  
+   dotnet format modules --check --fix-style warn --fix-whitespace  
   displayName: 'Lint dotnet code'
   
 - task: DotNetCoreCLI@2
