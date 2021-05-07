@@ -22,7 +22,7 @@
           "edgeAgent": {
             "type": "docker",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-agent:1.0",
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.1.0",
               "createOptions": {}
             }
           },
@@ -31,7 +31,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.1.0",
               "createOptions": {
                 "HostConfig": {
                   "PortBindings": {
@@ -58,7 +58,7 @@
         },
         "modules": {
           "RedisTimeSeries": {
-            "version": "1.0",
+            "version": "$BUILD_VERSION",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
@@ -75,13 +75,13 @@
             }
           },
           "SimulatedTemperatureSensor": {
-            "version": "1.0",
+            "version": "$BUILD_VERSION",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "startupOrder": 0,
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0",
+              "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.1.0",
               "createOptions": {}
             },
             "env": {
@@ -94,7 +94,7 @@
             }
           },
           "RedisTimeSeriesEdge": {
-            "version": "1.0",
+            "version": "$BUILD_VERSION",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
@@ -117,7 +117,7 @@
             }
           },
           "RedisExporter": {
-            "version": "1.0",
+            "version": "$BUILD_VERSION",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
@@ -140,7 +140,7 @@
             }
           },
           "Prometheus": {
-            "version": "1.0",
+            "version": "$BUILD_VERSION",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
@@ -153,7 +153,7 @@
             }
           },
           "Grafana": {
-            "version": "1.0",
+            "version": "$BUILD_VERSION",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
