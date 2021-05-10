@@ -9,8 +9,6 @@ USER moduleuser
 RUN curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l ~/vsdbg
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build-env
-ARG BUILD_VERSION
-ENV BUILD_VERSION=$BUILD_VERSION
 
 WORKDIR /app
 
@@ -18,7 +16,7 @@ COPY *.csproj ./
 RUN dotnet restore
 
 COPY . ./
-RUN dotnet publish -c Debug -o out /p:Version=$BUILD_VERSION
+RUN dotnet publish -c Debug -o out
 
 FROM base
 WORKDIR /app
