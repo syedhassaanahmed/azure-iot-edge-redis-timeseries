@@ -64,7 +64,7 @@
             "restartPolicy": "always",
             "startupOrder": 0,
             "settings": {
-              "image": "${MODULES.RedisTimeSeries}",
+              "image": "${MODULEDIR<./modules/RedisTimeSeries>}",
               "createOptions": {
                 "HostConfig": {
                   "Binds": [
@@ -100,7 +100,7 @@
             "restartPolicy": "always",
             "startupOrder": 1,
             "settings": {
-              "image": "${MODULES.RedisTimeSeriesEdge.debug}",
+              "image": "${MODULEDIR<./modules/RedisTimeSeriesEdge>.debug}",
               "createOptions": {
                 "Hostname": "$REDIS_TIMESERIES_EDGE_HOST",
                 "HostConfig": {
@@ -146,7 +146,7 @@
             "restartPolicy": "always",
             "startupOrder": 2,
             "settings": {
-              "image": "${MODULES.Prometheus}",
+              "image": "${MODULEDIR<./modules/Prometheus>}",
               "createOptions": {
                 "Hostname": "$PROMETHEUS_HOST"
               }
@@ -159,7 +159,7 @@
             "restartPolicy": "always",
             "startupOrder": 3,
             "settings": {
-              "image": "${MODULES.Grafana}",
+              "image": "${MODULEDIR<./modules/Grafana>}",
               "createOptions": {
                 "HostConfig": {
                   "Binds": [

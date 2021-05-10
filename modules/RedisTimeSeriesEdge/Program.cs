@@ -1,7 +1,6 @@
 using IoTEdgeLogger;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
-using Microsoft.Azure.Devices.Shared;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Prometheus;
@@ -11,7 +10,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Runtime.Loader;
 using System.Text;
 using System.Threading;
