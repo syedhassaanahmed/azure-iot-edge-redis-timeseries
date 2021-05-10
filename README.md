@@ -3,7 +3,6 @@ This sample [Azure IoT Edge](https://docs.microsoft.com/en-us/azure/iot-edge/?vi
 
 ## Features
 - Connects to Redis with [Unix Sockets](https://redis.io/topics/clients) instead of the TCP port.
-- Sends its .NET Assembly version as an [Azure IoT Hub Module Twin](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-module-twins) Reported Property.
 - Makes .NET runtime metrics available in Prometheus format.
 - Scrapes Redis usage metrics in Prometheus format.
 - Exposes an [Azure IoT Hub Direct Method](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-direct-methods) named `GetTimeSeriesInfo`. This method can be used to retrieve statistics about the stored data in RedisTimeSeries.

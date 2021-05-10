@@ -83,27 +83,12 @@ namespace RedisTimeSeriesEdge
             await moduleClient.OpenAsync();
             Log.LogInformation("IoT Hub module client initialized.");
 
-            await ReportAssemblyVersionAsync(moduleClient);
-
             await InitTimeSeriesRepositoryAsync();
 
             // Register callback to be called when a message is received by the module
             await moduleClient.SetInputMessageHandlerAsync("input1", PipeMessage, moduleClient);
 
             await moduleClient.SetMethodDefaultHandlerAsync(GetTimeSeriesInfo, moduleClient);
-        }
-
-        static async Task ReportAssemblyVersionAsync(ModuleClient moduleClient)
-        {
-            var assemblyVersion = Assembly.GetEntryAssembly().GetName().Version.ToString();
-            Log.LogInformation($"Assembly Version: {assemblyVersion}");
-
-            var reportedProperties = new TwinCollection
-            {
-                ["AssemblyVersion"] = assemblyVersion
-            };
-
-            await moduleClient.UpdateReportedPropertiesAsync(reportedProperties);
         }
 
         static async Task InitTimeSeriesRepositoryAsync()

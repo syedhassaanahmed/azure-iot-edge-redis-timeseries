@@ -1,6 +1,4 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster-arm32v7 AS build-env
-ARG BUILD_VERSION
-ENV BUILD_VERSION=$BUILD_VERSION
 
 WORKDIR /app
 
@@ -8,7 +6,7 @@ COPY *.csproj ./
 RUN dotnet restore
 
 COPY . ./
-RUN dotnet publish -c Release -o out /p:Version=$BUILD_VERSION
+RUN dotnet publish -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/core/runtime:3.1-buster-slim-arm32v7
 WORKDIR /app
