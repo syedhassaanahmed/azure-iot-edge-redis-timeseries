@@ -6,7 +6,7 @@
         "tag": {
             "version": "${BUILD_VERSION}",
             "platforms": {
-                "amd64": "./Dockerfile"
+                "amd64": "./Dockerfile.amd64"
             }
         },
         "buildOptions": ["--build-arg PROMETHEUS_HOST=${PROMETHEUS_HOST} --build-arg REDIS_UNIX_SOCKET_DIR=${REDIS_UNIX_SOCKET_DIR}"],

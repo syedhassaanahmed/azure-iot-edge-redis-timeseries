@@ -23,7 +23,10 @@
     <None Include="deployment.debug.template.json" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="modules\RedisTimeSeriesEdge\RedisTimeSeriesEdge.csproj" />
+    <ProjectReference Include=".\modules\Grafana\Grafana.csproj" />
+    <ProjectReference Include=".\modules\Prometheus\Prometheus.csproj" />
+    <ProjectReference Include=".\modules\RedisTimeSeries\RedisTimeSeries.csproj" />
+    <ProjectReference Include=".\modules\RedisTimeSeriesEdge\RedisTimeSeriesEdge.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsRoot)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Azure IoT Edge Tools\AzureIoTEdgeProject.Build.targets" />
   <Import Project="$(MSBuildToolsRoot)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Azure IoT Edge Tools\AzureIoTEdgeProject.Build.props" />

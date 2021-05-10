@@ -9,6 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedisTimeSeriesEdge", "modu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeSeriesRepository.Test", "tests\TimeSeriesRepository.Test\TimeSeriesRepository.Test.csproj", "{ED151DEF-36B6-460D-81AA-F9D0FB2504E2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedisTimeSeries", "modules\RedisTimeSeries\RedisTimeSeries.csproj", "{4D54BF57-1182-4F0B-A106-9BE99F7CAFD6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Grafana", "modules\Grafana\Grafana.csproj", "{D5468A84-70DC-4816-8FDB-456E644B0D4F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prometheus", "modules\Prometheus\Prometheus.csproj", "{54BD8DA1-54D3-4E1D-BD10-D020F34D8D6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +33,18 @@ Global
 		{ED151DEF-36B6-460D-81AA-F9D0FB2504E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED151DEF-36B6-460D-81AA-F9D0FB2504E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED151DEF-36B6-460D-81AA-F9D0FB2504E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D54BF57-1182-4F0B-A106-9BE99F7CAFD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D54BF57-1182-4F0B-A106-9BE99F7CAFD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D54BF57-1182-4F0B-A106-9BE99F7CAFD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D54BF57-1182-4F0B-A106-9BE99F7CAFD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5468A84-70DC-4816-8FDB-456E644B0D4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5468A84-70DC-4816-8FDB-456E644B0D4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5468A84-70DC-4816-8FDB-456E644B0D4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5468A84-70DC-4816-8FDB-456E644B0D4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54BD8DA1-54D3-4E1D-BD10-D020F34D8D6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54BD8DA1-54D3-4E1D-BD10-D020F34D8D6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54BD8DA1-54D3-4E1D-BD10-D020F34D8D6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54BD8DA1-54D3-4E1D-BD10-D020F34D8D6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
