@@ -9,7 +9,10 @@
                 "amd64": "./Dockerfile"
             }
         },
-        "buildOptions": ["--build-arg PROMETHEUS_HOST=${PROMETHEUS_HOST} --build-arg REDIS_UNIX_SOCKET_DIR=${REDIS_UNIX_SOCKET_DIR}"],
+        "buildOptions": [
+            "--build-arg PROMETHEUS_HOST=${PROMETHEUS_HOST}",
+            "--build-arg REDIS_UNIX_SOCKET_DIR=${REDIS_UNIX_SOCKET_DIR}"
+        ],
         "contextPath": "./"
     },
     "language": "other"
