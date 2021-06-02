@@ -1,7 +1,6 @@
 using IoTEdgeLogger;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
-using Microsoft.Azure.Devices.Shared;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Prometheus;
@@ -11,7 +10,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Runtime.Loader;
 using System.Text;
 using System.Threading;
@@ -22,10 +20,12 @@ namespace RedisTimeSeriesEdge
     class Program
     {
         const string DefaultLogLevel = "debug";
+        const string DotNetEnvironmentKey = "DOTNET_ENVIRONMENT";
         const string RedisUnixSocketFileKey = "REDIS_UNIX_SOCKET_FILE";
         const int MetricsPort = 9121;
 
         static ILogger Log;
+        static IModuleClient ModuleClientWrapper;
         static TimeSeriesRepository Repository;
 
         static async Task Main()
@@ -44,6 +44,7 @@ namespace RedisTimeSeriesEdge
             await WhenCancelled(cts.Token);
 
             await Repository?.CloseAsync();
+            await ModuleClientWrapper?.CloseAsync();
             metricServer.Stop();
         }
 
@@ -75,20 +76,30 @@ namespace RedisTimeSeriesEdge
         /// </summary>
         static async Task InitAsync()
         {
-            var mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
-            ITransportSettings[] settings = { mqttSetting };
-
-            // Open a connection to the Edge runtime
-            var moduleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
-            await moduleClient.OpenAsync();
-            Log.LogInformation("IoT Hub module client initialized.");
-
+            await InitModuleClientWrapperAsync();
             await InitTimeSeriesRepositoryAsync();
 
-            // Register callback to be called when a message is received by the module
-            await moduleClient.SetInputMessageHandlerAsync("input1", PipeMessage, moduleClient);
+            await ModuleClientWrapper.SetInputMessageHandlerAsync("input1", PipeMessage);
+            await ModuleClientWrapper.SetMethodDefaultHandlerAsync(GetTimeSeriesInfo);
+        }
 
-            await moduleClient.SetMethodDefaultHandlerAsync(GetTimeSeriesInfo, moduleClient);
+        static async Task InitModuleClientWrapperAsync()
+        {
+            if (Environment.GetEnvironmentVariable(DotNetEnvironmentKey) == "Development")
+            {
+                ModuleClientWrapper = new MockModuleClientWrapper(Log);
+            }
+            else
+            {
+                var mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
+                ITransportSettings[] settings = { mqttSetting };
+
+                var moduleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
+                ModuleClientWrapper = new ModuleClientWrapper(moduleClient);
+            }
+
+            await ModuleClientWrapper.OpenAsync();
+            Log.LogInformation("IoT Hub module client initialized.");
         }
 
         static async Task InitTimeSeriesRepositoryAsync()

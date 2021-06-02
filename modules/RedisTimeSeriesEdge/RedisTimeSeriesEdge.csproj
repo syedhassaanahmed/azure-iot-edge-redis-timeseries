@@ -2,6 +2,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>.</DockerfileContext>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
@@ -10,19 +12,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectCapability Include="AzureIoTEdgeModule"/>
+    <ProjectCapability Include="AzureIoTEdgeModule" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="IoTEdgeLogger" Version="1.0.1" />
     <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.36.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.14" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.14" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.14" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.14" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.14" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.14" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.14" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.15" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.15" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.15" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.15" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.15" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.15" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.15" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.14" />
     <PackageReference Include="NRedisTimeSeries" Version="1.3.0" />
     <PackageReference Include="prometheus-net.DotNetRuntime" Version="4.0.0" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />

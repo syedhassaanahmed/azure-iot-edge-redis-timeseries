@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  RedisTimeSeries:
+    image: ${DOCKER_REGISTRY-}redistimeseries:${BUILD_VERSION}-amd64
+    build:
+      context: modules/RedisTimeSeries
+      dockerfile: Dockerfile
+      args:
+        REDIS_UNIX_SOCKET_DIR: ${REDIS_UNIX_SOCKET_DIR}
+    restart: always
+    volumes:
+    - source: ${REDIS_UNIX_SOCKET_VOL}
+      target: ${REDIS_UNIX_SOCKET_DIR}
+      type: volume
+  RedisTimeSeriesEdge:
+    image: ${DOCKER_REGISTRY-}redistimeseriesedge:${BUILD_VERSION}-amd64.debug
+    build:
+      context: modules/RedisTimeSeriesEdge
+      dockerfile: Dockerfile.amd64.debug
+    environment:
+    - REDIS_UNIX_SOCKET_FILE=${REDIS_UNIX_SOCKET_DIR}/redis.sock
+    - DOTNET_ENVIRONMENT=Development
+    volumes:
+    - source: ${REDIS_UNIX_SOCKET_VOL}
+      target: ${REDIS_UNIX_SOCKET_DIR}
+      type: volume
+    depends_on:
+    - RedisTimeSeries
+volumes:
+  redisUnixSocketVol:
+    name: ${REDIS_UNIX_SOCKET_VOL}
