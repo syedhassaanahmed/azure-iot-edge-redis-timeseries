@@ -16,6 +16,9 @@ steps:
 - script: pip install -U iotedgedev
   displayName: 'Install IoT Edge Dev Tool'
 
+- script: az extension add --name azure-iot
+  displayName: 'Install azure-iot extension'
+
 - task: DotNetCoreCLI@2
   displayName: 'Build C# projects and run unit tests'
   inputs:
