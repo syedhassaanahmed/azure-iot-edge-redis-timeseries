@@ -10,6 +10,7 @@ variables:
   BUILD_VERSION: '$(Build.BuildId)'
   iothubname: 'edge-test-hub1'
   edgeDeviceId: 'edge02'
+  ENDPOINT: $(azureSubscriptionEndpoint)
 
 steps:
 - script: pip install -U iotedgedev
@@ -62,8 +63,8 @@ steps:
   inputs:
     action: 'Push module images'
     containerregistrytype: 'Azure Container Registry'
-    azureSubscriptionEndpoint: '$(azureSubscriptionEndpoint)'
-    azureContainerRegistry: '{"loginServer":"$(CONTAINER_REGISTRY_SERVER)", "id":"/subscriptions/$(azureSubscriptionEndpoint)"}'
+    azureSubscriptionEndpoint: '$(ENDPOINT)'
+    azureContainerRegistry: '{"loginServer":"$(CONTAINER_REGISTRY_SERVER)", "id":"/subscriptions/$(ENDPOINT)"}'
     templateFilePath: 'deployment.template.json'
     defaultPlatform: 'amd64'
     fillRegistryCredential: 'true'
@@ -83,7 +84,7 @@ steps:
   inputs:
     action: 'Deploy to IoT Edge devices'
     deploymentFilePath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
-    azureSubscription: '$(azureSubscriptionEndpoint)'
+    azureSubscription: '$(ENDPOINT)'
     iothubname: '$(iothubname)'
     deploymentid: '$(System.TeamProject)-devops-deployment'
     priority: '0'
