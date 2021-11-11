@@ -24,10 +24,10 @@ namespace RedisTimeSeriesEdge
     class MessageBody
     {
         [JsonProperty(PropertyName = "machine")]
-        public Machine Machine { get; set; }
+        public Machine? Machine { get; set; }
 
         [JsonProperty(PropertyName = "ambient")]
-        public Ambient Ambient { get; set; }
+        public Ambient? Ambient { get; set; }
 
         [JsonProperty(PropertyName = "timeCreated")]
         public DateTimeOffset TimeCreated { get; set; }

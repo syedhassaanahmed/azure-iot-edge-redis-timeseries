@@ -1,7 +1,6 @@
 FROM alpine AS substitute
 
 ARG REDIS_EXPORTER_HOST
-ARG REDIS_TIMESERIES_EDGE_HOST
 
 RUN apk add gettext
 COPY prometheus.yml /temp.yml

@@ -2,6 +2,3 @@ scrape_configs:
   - job_name: redis_exporter
     static_configs:
     - targets: ['$REDIS_EXPORTER_HOST:9121']
-  - job_name: 'dotnet_runtime'
-    static_configs:
-    - targets: ['$REDIS_TIMESERIES_EDGE_HOST:9121']

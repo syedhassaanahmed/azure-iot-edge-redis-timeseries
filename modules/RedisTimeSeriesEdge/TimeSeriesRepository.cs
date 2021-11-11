@@ -2,22 +2,18 @@ using Microsoft.Extensions.Logging;
 using NRedisTimeSeries;
 using NRedisTimeSeries.DataTypes;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace RedisTimeSeriesEdge
 {
     public class TimeSeriesRepository
     {
         readonly IConnectionMultiplexer Redis;
-        readonly ILogger Log;
-        readonly string DeviceId;
+        readonly ILogger? Log;
+        readonly string? DeviceId;
 
         static readonly string[] TimeSeriesKeys = { "simulated_temperature", "simulated_pressure", "simulated_humidity" };
 
-        public TimeSeriesRepository(IConnectionMultiplexer redis, ILogger log, string deviceId)
+        public TimeSeriesRepository(IConnectionMultiplexer redis, ILogger? log, string? deviceId)
         {
             if (redis == null)
             {
@@ -39,7 +35,7 @@ namespace RedisTimeSeriesEdge
             await Task.WhenAll(tasks);
         }
 
-        async Task CreateTimeSeriesIfNotExistsAsync(IDatabase db, string timeSeriesName, List<TimeSeriesLabel> labels)
+        async Task CreateTimeSeriesIfNotExistsAsync(IDatabase db, string timeSeriesName, List<TimeSeriesLabel>? labels)
         {
             var timeSeriesExists = await db.KeyExistsAsync(timeSeriesName);
 
@@ -85,7 +81,7 @@ namespace RedisTimeSeriesEdge
             var keyValueResult = new Dictionary<string, string> { { "timeSeriesName", timeSeriesName } };
             for (var i = 0; i < redisResults.Length; i += 2)
             {
-                keyValueResult.Add(redisResults[i].ToString(), redisResults[i + 1].ToString());
+                keyValueResult.Add(redisResults[i].ToString()!, redisResults[i + 1].ToString()!);
             }
 
             return keyValueResult;

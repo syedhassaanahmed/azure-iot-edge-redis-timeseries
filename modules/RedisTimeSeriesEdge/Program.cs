@@ -3,35 +3,26 @@ using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Prometheus;
-using Prometheus.DotNetRuntime;
 using StackExchange.Redis;
-using System;
 using System.Diagnostics;
-using System.IO;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Runtime.Loader;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RedisTimeSeriesEdge
 {
     class Program
     {
         const string DefaultLogLevel = "debug";
-        const string DotNetEnvironmentKey = "DOTNET_ENVIRONMENT";
-        const string RedisUnixSocketFileKey = "REDIS_UNIX_SOCKET_FILE";
-        const int MetricsPort = 9121;
+        const string RedisAddress = "REDIS_ADDRESS";
 
-        static ILogger Log;
-        static IModuleClient ModuleClientWrapper;
-        static TimeSeriesRepository Repository;
+        static ILogger? Log;
+        static ModuleClient? ModuleClient;
+        static TimeSeriesRepository? Repository;
 
         static async Task Main()
         {
-            var metricServer = StartPrometheusMetricServer();
-
             Logger.SetLogLevel(DefaultLogLevel);
             Log = Logger.Factory.CreateLogger<string>();
 
@@ -43,18 +34,8 @@ namespace RedisTimeSeriesEdge
             Console.CancelKeyPress += (sender, cpe) => cts.Cancel();
             await WhenCancelled(cts.Token);
 
-            await Repository?.CloseAsync();
-            await ModuleClientWrapper?.CloseAsync();
-            metricServer.Stop();
-        }
-
-        static MetricServer StartPrometheusMetricServer()
-        {
-            DotNetRuntimeStatsBuilder.Default().StartCollecting();
-            var metricServer = new MetricServer(port: MetricsPort);
-            metricServer.Start();
-
-            return metricServer;
+            await Repository!.CloseAsync();
+            await ModuleClient!.CloseAsync();
         }
 
         /// <summary>
@@ -65,7 +46,7 @@ namespace RedisTimeSeriesEdge
             var tcs = new TaskCompletionSource<bool>();
             cancellationToken.Register(s =>
             {
-                ((TaskCompletionSource<bool>)s).SetResult(true);
+                (s as TaskCompletionSource<bool>)!.SetResult(true);
             }, tcs);
             return tcs.Task;
         }
@@ -76,48 +57,50 @@ namespace RedisTimeSeriesEdge
         /// </summary>
         static async Task InitAsync()
         {
-            await InitModuleClientWrapperAsync();
+            await InitModuleClientAsync();
             await InitTimeSeriesRepositoryAsync();
 
-            await ModuleClientWrapper.SetInputMessageHandlerAsync("input1", PipeMessage);
-            await ModuleClientWrapper.SetMethodDefaultHandlerAsync(GetTimeSeriesInfo);
+            await ModuleClient!.SetInputMessageHandlerAsync("input1", PipeMessage, ModuleClient);
+            await ModuleClient!.SetMethodDefaultHandlerAsync(GetTimeSeriesInfo, ModuleClient);
         }
 
-        static async Task InitModuleClientWrapperAsync()
+        static async Task InitModuleClientAsync()
         {
-            if (Environment.GetEnvironmentVariable(DotNetEnvironmentKey) == "Development")
-            {
-                ModuleClientWrapper = new MockModuleClientWrapper(Log);
-            }
-            else
-            {
-                var mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
-                ITransportSettings[] settings = { mqttSetting };
+            var mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
+            ITransportSettings[] settings = { mqttSetting };
 
-                var moduleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
-                ModuleClientWrapper = new ModuleClientWrapper(moduleClient);
-            }
+            ModuleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
 
-            await ModuleClientWrapper.OpenAsync();
-            Log.LogInformation("IoT Hub module client initialized.");
+            await ModuleClient.OpenAsync();
+            Log!.LogInformation("IoT Hub module client initialized.");
         }
 
         static async Task InitTimeSeriesRepositoryAsync()
         {
-            var redisUnixSocketFile = Environment.GetEnvironmentVariable(RedisUnixSocketFileKey);
-            if (string.IsNullOrWhiteSpace(redisUnixSocketFile))
+            var redisAddress = Environment.GetEnvironmentVariable(RedisAddress);
+            if (string.IsNullOrWhiteSpace(redisAddress))
             {
-                throw new ArgumentNullException(RedisUnixSocketFileKey);
+                throw new ArgumentNullException(RedisAddress);
             }
 
-            if (!File.Exists(redisUnixSocketFile))
+            var redisConfig = new ConfigurationOptions();
+
+            if (redisAddress.EndsWith(".sock", true, CultureInfo.InvariantCulture))
             {
-                throw new ArgumentException($"File {redisUnixSocketFile} not found.");
+                if (!File.Exists(redisAddress))
+                {
+                    throw new ArgumentException($"File {redisAddress} not found.");
+                }
+
+                redisConfig.EndPoints.Add(new UnixDomainSocketEndPoint(redisAddress));
+            }
+            else
+            {
+                redisConfig.EndPoints.Add(redisAddress);
             }
 
-            var redisConfig = new ConfigurationOptions { EndPoints = { new UnixDomainSocketEndPoint(redisUnixSocketFile) } };
             var redis = ConnectionMultiplexer.Connect(redisConfig);
-            Log.LogInformation($"Redis Connection Status: {redis.GetStatus()}");
+            Log!.LogInformation($"Redis Connection Status: {redis.GetStatus()}");
 
             var iotEdgeDeviceId = Environment.GetEnvironmentVariable("IOTEDGE_DEVICEID");
             Repository = new TimeSeriesRepository(redis, Log, iotEdgeDeviceId);
@@ -144,10 +127,10 @@ namespace RedisTimeSeriesEdge
             if (!string.IsNullOrEmpty(messageString))
             {
                 var messageBody = JsonConvert.DeserializeObject<MessageBody>(messageString);
-                await Repository.InsertTimeSeriesAsync(messageBody.TimeCreated,
-                    messageBody.Machine.Temperature,
-                    messageBody.Machine.Pressure,
-                    messageBody.Ambient.Humidity);
+                await Repository!.InsertTimeSeriesAsync(messageBody.TimeCreated,
+                    messageBody.Machine!.Temperature,
+                    messageBody.Machine!.Pressure,
+                    messageBody.Ambient!.Humidity);
 
                 using var pipeMessage = new Message(messageBytes);
                 foreach (var prop in message.Properties)
@@ -159,16 +142,16 @@ namespace RedisTimeSeriesEdge
             }
 
             sw.Stop();
-            Log.LogDebug($"Message processing took {sw.Elapsed.TotalMilliseconds}ms");
+            Log!.LogDebug($"Message processing took {sw.Elapsed.TotalMilliseconds}ms");
 
             return MessageResponse.Completed;
         }
 
         static async Task<MethodResponse> GetTimeSeriesInfo(MethodRequest methodRequest, object userContext)
         {
-            Log.LogInformation($"Invoking direct method {nameof(GetTimeSeriesInfo)}.");
+            Log!.LogInformation($"Invoking direct method {nameof(GetTimeSeriesInfo)}.");
 
-            var timeSeriesInfo = await Repository.GetTimeSeriesInfoAsync();
+            var timeSeriesInfo = await Repository!.GetTimeSeriesInfoAsync();
             var serializedResult = JsonConvert.SerializeObject(timeSeriesInfo);
 
             return new MethodResponse(Encoding.UTF8.GetBytes(serializedResult), 200);
