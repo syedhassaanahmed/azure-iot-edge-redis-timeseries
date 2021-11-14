@@ -15,12 +15,7 @@ namespace RedisTimeSeriesEdge
 
         public TimeSeriesRepository(IConnectionMultiplexer redis, ILogger? log, string? deviceId)
         {
-            if (redis == null)
-            {
-                throw new ArgumentNullException(nameof(redis));
-            }
-
-            Redis = redis;
+            Redis = redis ?? throw new ArgumentNullException(nameof(redis));
             Log = log;
             DeviceId = deviceId;
         }
@@ -54,10 +49,12 @@ namespace RedisTimeSeriesEdge
         {
             var unixTimestamp = timeCreated.ToUnixTimeMilliseconds();
 
-            var sequence = new List<(string, TimeStamp, double)>(TimeSeriesKeys.Length);
-            sequence.Add((TimeSeriesKeys[0], unixTimestamp, temperature));
-            sequence.Add((TimeSeriesKeys[1], unixTimestamp, pressure));
-            sequence.Add((TimeSeriesKeys[2], unixTimestamp, humidity));
+            var sequence = new List<(string, TimeStamp, double)>(TimeSeriesKeys.Length)
+            {
+                (TimeSeriesKeys[0], unixTimestamp, temperature),
+                (TimeSeriesKeys[1], unixTimestamp, pressure),
+                (TimeSeriesKeys[2], unixTimestamp, humidity)
+            };
 
             await Redis.GetDatabase().TimeSeriesMAddAsync(sequence);
 

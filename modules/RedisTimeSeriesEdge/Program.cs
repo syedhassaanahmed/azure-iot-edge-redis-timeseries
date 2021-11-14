@@ -117,7 +117,7 @@ namespace RedisTimeSeriesEdge
             var sw = new Stopwatch();
             sw.Start();
 
-            if (!(userContext is ModuleClient moduleClient))
+            if (userContext is not ModuleClient moduleClient)
             {
                 throw new InvalidOperationException($"{nameof(userContext)} doesn't contain expected value.");
             }
