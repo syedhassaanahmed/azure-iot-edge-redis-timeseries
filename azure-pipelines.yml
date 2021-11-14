@@ -14,6 +14,7 @@ pool:
 
 variables:
   BUILD_VERSION: '$(Build.BuildId)'
+  IOTEDGEDEV_VERSION: '3.3.1'
 
 steps:
 - task: AzureIoTEdge@2

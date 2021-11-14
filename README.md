@@ -1,4 +1,6 @@
 # azure-iot-edge-redis-timeseries
+[![Build Status](https://dev.azure.com/syedhassaanahmed/azure-iot-edge-redis-timeseries/_apis/build/status/syedhassaanahmed.azure-iot-edge-redis-timeseries?branchName=main)](https://dev.azure.com/syedhassaanahmed/azure-iot-edge-redis-timeseries/_build/latest?definitionId=11&branchName=main)
+
 This sample [Azure IoT Edge](https://docs.microsoft.com/en-us/azure/iot-edge/?view=iotedge-2020-11) solution demonstrates how to store timeseries data from IoT sensors to [RedisTimeSeries](https://oss.redislabs.com/redistimeseries/). The [Simulated Temperature Sensor](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/azure-iot.simulated-temperature-sensor?tab=overview) Edge module is used to generate temperature, pressure and humidity measurements. These measurements are then [routed](https://docs.microsoft.com/en-us/azure/iot-edge/module-composition?view=iotedge-2020-11) to our custom [C# Edge module](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-csharp-module?view=iotedge-2020-11) which stores them in RedisTimeSeries.
 
 ## Features
