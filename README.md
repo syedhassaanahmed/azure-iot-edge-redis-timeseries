@@ -13,18 +13,15 @@ This sample [Azure IoT Edge](https://docs.microsoft.com/en-us/azure/iot-edge/?vi
 <div style=""><img src="images/data_flow.png"/></center></div>
 
 ## Prerequisites
-- Azure IoT Hub with an Edge device provisioned
+- Azure IoT Hub with a [provisioned Edge device](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-provision-single-device-linux-symmetric?view=iotedge-2020-11&tabs=azure-portal)
 - [Docker Community Edition](https://docs.docker.com/get-docker/)
 - [.NET 6](https://dotnet.microsoft.com/download/dotnet/6.0)
 - [Python 3.8](https://www.python.org/downloads/release/python-389/)
 - [Azure IoT EdgeHub Dev Tool](https://github.com/Azure/iotedgehubdev)
-- [Visual Studio Code](https://code.visualstudio.com/)
-
-### Visual Studio Code
-The following extensions are required
-- [C#](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
-- [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
-- [Azure IoT Tools](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.azure-iot-tools)
+- [Visual Studio Code](https://code.visualstudio.com/) with the following extensions
+    - [C#](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
+    - [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
+    - [Azure IoT Tools](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.azure-iot-tools)
 
 ## Configuration
 The `.env` file can be modified for container version, container host names and to use an [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/) instead of a local docker registry.
