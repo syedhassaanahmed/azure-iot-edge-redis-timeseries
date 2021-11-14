@@ -13,7 +13,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  BUILD_VERSION: '$(Build.BuildId)'
+  BUILD_VERSION: '0.0.$(Build.BuildId)'
 
 steps:
 - script: pip install -U iotedgedev==2.1.0
