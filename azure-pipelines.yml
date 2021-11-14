@@ -14,9 +14,11 @@ pool:
 
 variables:
   BUILD_VERSION: '$(Build.BuildId)'
-  IOTEDGEDEV_VERSION: '3.3.1'
 
 steps:
+- script: pip install -U iotedgedev==3.3.1
+  displayName: 'Install IoT Edge Dev Tool'
+
 - task: AzureIoTEdge@2
   displayName: 'Build module images'
   inputs:
