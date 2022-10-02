@@ -16,7 +16,7 @@ variables:
   BUILD_VERSION: '0.0.$(Build.BuildId)'
 
 steps:
-- script: pip install -U iotedgedev==2.1.0
+- script: pip install -U iotedgedev
   displayName: 'Install IoT Edge Dev Tool'
 
 - script: iotedgedev build
