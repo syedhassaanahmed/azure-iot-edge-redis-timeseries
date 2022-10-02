@@ -1,9 +1,9 @@
 {
-  "$schema-template": "2.0.0",
+  "$schema-template": "4.0.0",
   "modulesContent": {
     "$edgeAgent": {
       "properties.desired": {
-        "schemaVersion": "1.0",
+        "schemaVersion": "1.1",
         "runtime": {
           "type": "docker",
           "settings": {
@@ -22,7 +22,7 @@
           "edgeAgent": {
             "type": "docker",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-agent:1.2",
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.4",
               "createOptions": {}
             }
           },
@@ -31,7 +31,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-hub:1.2",
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.4",
               "createOptions": {
                 "HostConfig": {
                   "PortBindings": {
@@ -81,7 +81,7 @@
             "restartPolicy": "always",
             "startupOrder": 0,
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.2",
+              "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.4",
               "createOptions": {}
             },
             "env": {
@@ -180,7 +180,7 @@
     },
     "$edgeHub": {
       "properties.desired": {
-        "schemaVersion": "1.0",
+        "schemaVersion": "1.2",
         "routes": {
           "sensorToRedisTimeSeriesEdge": "FROM /messages/modules/SimulatedTemperatureSensor/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/RedisTimeSeriesEdge/inputs/input1\")",
           "RedisTimeSeriesEdgeToIoTHub": "FROM /messages/modules/RedisTimeSeriesEdge/outputs/* INTO $upstream"

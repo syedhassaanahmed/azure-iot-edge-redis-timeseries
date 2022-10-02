@@ -19,23 +19,9 @@ steps:
 - script: pip install -U iotedgedev==2.1.0
   displayName: 'Install IoT Edge Dev Tool'
 
-- task: AzureIoTEdge@2
+- script: iotedgedev build
   displayName: 'Build module images'
-  inputs:
-    action: 'Build module images'
-    templateFilePath: 'deployment.template.json'
-    defaultPlatform: 'amd64'
 
-- task: AzureIoTEdge@2
-  displayName: 'Generate deployment manifest'
-  inputs:
-    action: 'Generate deployment manifest'
-    templateFilePath: 'deployment.template.json'
-    defaultPlatform: 'amd64'
-    deploymentManifestOutputPath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
-    validateGeneratedDeploymentManifest: 'true'
-    fillRegistryCredential: 'true'
-
-- publish: '$(System.DefaultWorkingDirectory)/config/deployment.json'
+- publish: '$(System.DefaultWorkingDirectory)/config/deployment.amd64.json'
   artifact: 'IoTEdgeDeploymentManifest'
   displayName: 'Publish IoT Edge deployment manifest'

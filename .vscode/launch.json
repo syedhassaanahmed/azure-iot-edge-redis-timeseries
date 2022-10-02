@@ -23,21 +23,6 @@
         "/app": "${workspaceFolder}/modules/RedisTimeSeriesEdge"
       },
       "justMyCode": true
-    },
-    {
-      "name": "RedisTimeSeriesEdge Local Debug (.NET Core)",
-      "type": "coreclr",
-      "request": "launch",
-      "program": "${workspaceRoot}/modules/RedisTimeSeriesEdge/bin/Debug/netcoreapp3.1/RedisTimeSeriesEdge.dll",
-      "args": [],
-      "cwd": "${workspaceRoot}/modules/RedisTimeSeriesEdge",
-      "internalConsoleOptions": "openOnSessionStart",
-      "stopAtEntry": false,
-      "console": "internalConsole",
-      "env": {
-        "EdgeHubConnectionString": "${config:azure-iot-edge.EdgeHubConnectionString}",
-        "EdgeModuleCACertificateFile": "${config:azure-iot-edge.EdgeModuleCACertificateFile}"
-      }
     }
   ]
 }

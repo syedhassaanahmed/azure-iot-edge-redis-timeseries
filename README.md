@@ -17,11 +17,10 @@ This sample [Azure IoT Edge](https://docs.microsoft.com/en-us/azure/iot-edge/?vi
 - [Docker Community Edition](https://docs.docker.com/get-docker/)
 - [.NET 6](https://dotnet.microsoft.com/download/dotnet/6.0)
 - [Python 3.8](https://www.python.org/downloads/release/python-389/)
-- [Azure IoT EdgeHub Dev Tool](https://github.com/Azure/iotedgehubdev)
+- [Azure IoT Edge Dev Tool](https://github.com/Azure/iotedgedev)
 - [Visual Studio Code](https://code.visualstudio.com/) with the following extensions
     - [C#](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
     - [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
-    - [Azure IoT Tools](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.azure-iot-tools)
 
 ## Configuration
 The `.env` file can be modified for container version, container host names and to use an [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/) instead of a local docker registry.
