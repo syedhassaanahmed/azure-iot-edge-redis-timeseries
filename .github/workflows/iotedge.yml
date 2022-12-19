@@ -1,0 +1,24 @@
+name: Build IoT Edge Modules
+on:
+  push:
+    branches:
+    - main
+    paths-ignore:
+    - images/*
+    - README.md
+env:
+  BUILD_VERSION: 0.0.${{ github.run_id }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install IoT Edge Dev Tool
+      run: pip install -U iotedgedev #pyOpenSSL==22.0.0
+    - name: Build module images
+      run: iotedgedev build
+    - name: Publish IoT Edge deployment manifest
+      uses: actions/upload-artifact@v2
+      with:
+        path: ${{ github.workspace }}/config/deployment.amd64.json
+        name: IoTEdgeDeploymentManifest

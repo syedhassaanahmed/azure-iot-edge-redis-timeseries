@@ -1,5 +1,5 @@
 # azure-iot-edge-redis-timeseries
-[![Build Status](https://dev.azure.com/syedhassaanahmed/azure-iot-edge-redis-timeseries/_apis/build/status/syedhassaanahmed.azure-iot-edge-redis-timeseries?branchName=main)](https://dev.azure.com/syedhassaanahmed/azure-iot-edge-redis-timeseries/_build/latest?definitionId=11&branchName=main)
+![IoT Edge Build](https://github.com/syedhassaanahmed/azure-iot-edge-redis-timeseries/actions/workflows/iotedge.yml/badge.svg)
 
 This sample [Azure IoT Edge](https://docs.microsoft.com/en-us/azure/iot-edge/?view=iotedge-2020-11) solution demonstrates how to store timeseries data from IoT sensors to [RedisTimeSeries](https://oss.redislabs.com/redistimeseries/). The [Simulated Temperature Sensor](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/azure-iot.simulated-temperature-sensor?tab=overview) Edge module is used to generate temperature, pressure and humidity measurements. These measurements are then [routed](https://docs.microsoft.com/en-us/azure/iot-edge/module-composition?view=iotedge-2020-11) to our custom [C# Edge module](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-csharp-module?view=iotedge-2020-11) which stores them in RedisTimeSeries.
 
@@ -8,6 +8,7 @@ This sample [Azure IoT Edge](https://docs.microsoft.com/en-us/azure/iot-edge/?vi
 - Scrapes Redis usage metrics in Prometheus format.
 - Exposes an [Azure IoT Hub Direct Method](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-direct-methods) named `GetTimeSeriesInfo`. This method can be used to retrieve statistics about the stored data in RedisTimeSeries.
 - Provides Grafana dashboards for visualizing timeseries and above Prometheus data sources, [see below](#grafana-dashboards).
+- Support for [GitHub Codespaces](https://github.com/features/codespaces) through the [Docker-in-Docker Dev Container Feature](https://github.com/devcontainers/features/tree/main/src/docker-in-docker).
 
 ## Architecture
 <div style=""><img src="images/data_flow.png"/></center></div>
