@@ -1,11 +1,11 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0-focal AS publish
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS publish
 WORKDIR /src
 COPY *.csproj ./
 RUN dotnet restore
 COPY . .
 RUN dotnet publish -c Debug -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/runtime:6.0-focal
+FROM mcr.microsoft.com/dotnet/runtime:6.0
 RUN apt-get update && \
     apt-get install -y --no-install-recommends unzip procps curl && \
     rm -rf /var/lib/apt/lists/*
