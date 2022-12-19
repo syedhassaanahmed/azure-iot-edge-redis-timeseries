@@ -25,6 +25,7 @@ namespace RedisTimeSeriesEdge
         {
             Logger.SetLogLevel(DefaultLogLevel);
             Log = Logger.Factory.CreateLogger<string>();
+            Log.LogInformation("Entered RedisTimeSeriesEdge module.");
 
             await InitAsync();
 
@@ -66,8 +67,8 @@ namespace RedisTimeSeriesEdge
 
         static async Task InitModuleClientAsync()
         {
-            var mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
-            ITransportSettings[] settings = { mqttSetting };
+            var httpSettings = new Http1TransportSettings();
+            ITransportSettings[] settings = { httpSettings };
 
             ModuleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
 
