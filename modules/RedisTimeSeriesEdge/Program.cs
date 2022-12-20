@@ -67,8 +67,8 @@ namespace RedisTimeSeriesEdge
 
         static async Task InitModuleClientAsync()
         {
-            var httpSettings = new Http1TransportSettings();
-            ITransportSettings[] settings = { httpSettings };
+            var mqttSettings = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
+            ITransportSettings[] settings = { mqttSettings };
 
             ModuleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
 
