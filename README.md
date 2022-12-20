@@ -8,7 +8,7 @@ This sample [Azure IoT Edge](https://docs.microsoft.com/en-us/azure/iot-edge/?vi
 - Scrapes Redis usage metrics in Prometheus format.
 - Exposes an [Azure IoT Hub Direct Method](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-direct-methods) named `GetTimeSeriesInfo`. This method can be used to retrieve statistics about the stored data in RedisTimeSeries.
 - Provides Grafana dashboards for visualizing timeseries and above Prometheus data sources, [see below](#grafana-dashboards).
-- Support for [GitHub Codespaces](https://github.com/features/codespaces) through the [Docker-in-Docker Dev Container Feature](https://github.com/devcontainers/features/tree/main/src/docker-in-docker).
+- Support for [Dev Container](https://code.visualstudio.com/docs/devcontainers/containers) through the [Docker-in-Docker Feature](https://github.com/devcontainers/features/tree/main/src/docker-in-docker).
 
 ## Architecture
 <div style=""><img src="images/data_flow.png"/></center></div>
