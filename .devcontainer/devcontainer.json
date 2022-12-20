@@ -22,5 +22,6 @@
         "ghcr.io/devcontainers/features/dotnet:1": {
             "version": "6"
         }
-    }
+    },
+    "postCreateCommand": "git config --global --add safe.directory /workspaces/azure-iot-edge-redis-timeseries"
 }
