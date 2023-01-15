@@ -2,13 +2,11 @@ name: Build IoT Edge Modules
 on:
   push:
     branches:
-    - main
-    paths-ignore:
-    - images/*
-    - README.md
+      - main
   pull_request:
-    branches:
-    - main
+    paths-ignore:
+      - 'README.md'
+      - 'images/**'
 env:
   BUILD_VERSION: 0.0.${{ github.run_id }}
 jobs:
