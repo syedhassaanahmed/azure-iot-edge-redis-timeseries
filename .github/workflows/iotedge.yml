@@ -6,13 +6,16 @@ on:
     paths-ignore:
     - images/*
     - README.md
+  pull_request:
+    branches:
+    - main
 env:
   BUILD_VERSION: 0.0.${{ github.run_id }}
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install IoT Edge Dev Tool
       run: pip install -U iotedgedev #pyOpenSSL==22.0.0
     - name: Build module images
